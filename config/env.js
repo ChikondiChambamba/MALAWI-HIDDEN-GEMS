@@ -47,8 +47,17 @@ const env = {
   dbName: required('DB_NAME'),
   maxUploadSizeBytes: optionalNumber('MAX_UPLOAD_SIZE_BYTES', 5 * 1024 * 1024),
   sessionSecret: required('SESSION_SECRET'),
-  adminUsername: required('ADMIN_USERNAME'),
   adminPassword: required('ADMIN_PASSWORD'),
+  cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
+  cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',
+  cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET || '',
+  cloudinaryFolder: process.env.CLOUDINARY_FOLDER || 'malawi-hidden-gems',
 };
+
+env.hasCloudinaryConfig = Boolean(
+  env.cloudinaryCloudName
+  && env.cloudinaryApiKey
+  && env.cloudinaryApiSecret
+);
 
 module.exports = env;

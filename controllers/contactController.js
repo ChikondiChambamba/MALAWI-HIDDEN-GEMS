@@ -1,10 +1,10 @@
 const Contact = require('../models/contactModel');
-const { sanitizePlainText } = require('../utils/text');
+const { sanitizePlainText, sanitizeRichText } = require('../utils/text');
 
 function renderContactForm(req, res) {
   res.render('contact', {
-    title: 'Contact Malawi Tourism Blog',
-    pageDescription: 'Contact the Malawi Tourism Blog team with questions, feedback, or partnership ideas.',
+    title: 'Contact Malawi Hidden Gems',
+    pageDescription: 'Contact the Malawi Hidden Gems team with questions, feedback, or partnership ideas.',
     form: {
       name: '',
       email: '',
@@ -17,13 +17,13 @@ async function submitContactForm(req, res) {
   const form = {
     name: sanitizePlainText(req.body.name, 120),
     email: sanitizePlainText(req.body.email, 255),
-    message: sanitizePlainText(req.body.message, 2000),
+    message: sanitizeRichText(req.body.message, 4000),
   };
 
   if (!form.name || !form.email || !form.message) {
     return res.status(400).render('contact', {
-      title: 'Contact Malawi Tourism Blog',
-      pageDescription: 'Contact the Malawi Tourism Blog team with questions, feedback, or partnership ideas.',
+      title: 'Contact Malawi Hidden Gems',
+      pageDescription: 'Contact the Malawi Hidden Gems team with questions, feedback, or partnership ideas.',
       error: 'Name, email, and message are all required.',
       form,
     });
@@ -33,8 +33,8 @@ async function submitContactForm(req, res) {
 
   if (!emailIsValid) {
     return res.status(400).render('contact', {
-      title: 'Contact Malawi Tourism Blog',
-      pageDescription: 'Contact the Malawi Tourism Blog team with questions, feedback, or partnership ideas.',
+      title: 'Contact Malawi Hidden Gems',
+      pageDescription: 'Contact the Malawi Hidden Gems team with questions, feedback, or partnership ideas.',
       error: 'Please enter a valid email address.',
       form,
     });
@@ -43,8 +43,8 @@ async function submitContactForm(req, res) {
   await Contact.createContact(form);
 
   res.render('contact', {
-    title: 'Contact Malawi Tourism Blog',
-    pageDescription: 'Contact the Malawi Tourism Blog team with questions, feedback, or partnership ideas.',
+    title: 'Contact Malawi Hidden Gems',
+    pageDescription: 'Contact the Malawi Hidden Gems team with questions, feedback, or partnership ideas.',
     success: 'Thanks for reaching out. Your message has been received.',
     form: {
       name: '',

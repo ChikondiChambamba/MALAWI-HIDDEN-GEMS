@@ -1,13 +1,14 @@
 <nav>
   <ul>
-    <li><a href="/posts"><i class="fas fa-home"></i>Home</a></li>
-    <li><a href="/about"><i class="fas fa-info-circle"></i>About</a></li>
-    <li><a href="/contact"><i class="fas fa-envelope"></i>Contact</a></li>
-    <li><a href="/create"><i class="fas fa-plus-circle"></i>Create Post</a></li>
+    <li><a href="/">Home</a></li>
+    <li><a href="/posts">Explore</a></li>
+    <li><a href="/about">About</a></li>
+    <li><a href="/contact">Contact</a></li>
+    <li><a href="/create">Create Post</a></li>
     <% if (isAdmin) { %>
-      <li><a href="/admin"><i class="fas fa-user-shield"></i>Admin</a></li>
+      <li><a href="/admin/dashboard">Admin</a></li>
     <% } else { %>
-      <li><a href="/admin/login"><i class="fas fa-lock"></i>Admin</a></li>
+      <li><a href="/admin/login">Admin</a></li>
     <% } %>
   </ul>
 </nav>

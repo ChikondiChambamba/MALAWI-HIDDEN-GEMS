@@ -1,19 +1,17 @@
 <%- include('partials/header') %>
 
 <section class="form-section">
-  <h2><i class="fas fa-envelope"></i> Contact Us</h2>
-  <p>Have questions about Malawi tourism? Want to share your experiences? We'd love to hear from you!</p>
+  <h2>Contact Us</h2>
+  <p>Have questions about Malawi Hidden Gems? Want to share feedback or partnership ideas? We'd love to hear from you.</p>
 
   <% if (typeof error !== 'undefined') { %>
     <div class="error-message">
-      <i class="fas fa-exclamation-circle"></i>
       <p><%= error %></p>
     </div>
   <% } %>
 
   <% if (typeof success !== 'undefined') { %>
     <div class="success-message">
-      <i class="fas fa-check-circle"></i>
       <p><%= success %></p>
     </div>
   <% } %>
@@ -35,8 +33,8 @@
     </div>
 
     <div class="form-actions">
-      <button type="submit" class="btn primary"><i class="fas fa-paper-plane"></i> Send Message</button>
-      <a href="/posts" class="btn secondary"><i class="fas fa-times"></i> Cancel</a>
+      <button type="submit" class="btn primary">Send Message</button>
+      <a href="/posts" class="btn secondary">Cancel</a>
     </div>
   </form>
 </section>
@@ -45,17 +43,14 @@
   <h3>Other Ways to Reach Us</h3>
   <div class="contact-methods">
     <div class="contact-method">
-      <i class="fas fa-envelope"></i>
       <h4>Email</h4>
       <p>info@malawitourism.com</p>
     </div>
     <div class="contact-method">
-      <i class="fas fa-phone"></i>
       <h4>Phone</h4>
       <p>+265 885 040 112</p>
     </div>
     <div class="contact-method">
-      <i class="fas fa-map-marker-alt"></i>
       <h4>Address</h4>
       <p>Tourism House<br>Lilongwe, Malawi</p>
     </div>

@@ -1,16 +1,17 @@
 <%- include('partials/header') %>
 
 <section class="form-section">
-  <h2><i class="fas fa-edit"></i> Edit Post</h2>
+  <h2>Edit Post</h2>
 
   <% if (typeof error !== 'undefined') { %>
     <div class="error-message">
-      <i class="fas fa-exclamation-triangle"></i>
       <p><%= error %></p>
     </div>
   <% } %>
 
   <form action="/posts/<%= post.id %>?_method=PUT" method="POST" class="post-form" enctype="multipart/form-data">
+    <input type="hidden" name="editorToken" value="<%= editorToken %>" id="editorTokenField">
+
     <div class="form-group">
       <label for="title">Title:</label>
       <input type="text" id="title" name="title" value="<%= form.title %>" required>
@@ -31,7 +32,7 @@
       <% if (post.imagePath) { %>
         <div class="existing-images">
           <div class="existing-thumb">
-            <img src="/images/<%= post.imagePath %>" alt="Current image">
+            <img src="<%= post.imageUrl %>" alt="Current image">
           </div>
         </div>
       <% } %>
@@ -47,9 +48,26 @@
       <textarea id="content" name="content" rows="10" required><%= form.content %></textarea>
     </div>
 
+    <div class="form-group">
+      <p class="checkbox-group__label">Tags</p>
+      <div class="checkbox-grid">
+        <% tags.forEach((tag) => { %>
+          <label class="checkbox-pill">
+            <input
+              type="checkbox"
+              name="tagSlugs"
+              value="<%= tag.slug %>"
+              <%= form.tagSlugs.includes(tag.slug) ? 'checked' : '' %>
+            >
+            <span><%= tag.name %></span>
+          </label>
+        <% }) %>
+      </div>
+    </div>
+
     <div class="form-actions">
-      <button type="submit" class="btn primary"><i class="fas fa-check"></i> Update Post</button>
-      <a href="/posts/<%= post.id %>" class="btn secondary"><i class="fas fa-times"></i> Cancel</a>
+      <button type="submit" class="btn primary">Update Post</button>
+      <a href="/posts/<%= post.id %>" class="btn secondary">Cancel</a>
     </div>
   </form>
 </section>

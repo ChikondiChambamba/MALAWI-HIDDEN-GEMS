@@ -1,4 +1,5 @@
 const express = require('express');
+const helmet = require('helmet');
 const path = require('path');
 const methodOverride = require('method-override');
 const session = require('express-session');
@@ -18,8 +19,25 @@ const app = express();
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
 
-app.locals.siteName = 'Malawi Tourism Blog';
+app.locals.siteName = 'Malawi Hidden Gems';
 
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", 'cdnjs.cloudflare.com'],
+      styleSrc: ["'self'", 'fonts.googleapis.com'],
+      imgSrc: ["'self'", 'res.cloudinary.com'],
+      fontSrc: ["'self'", 'fonts.gstatic.com'],
+      connectSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      baseUri: ["'self'"],
+      formAction: ["'self'"],
+      frameAncestors: ["'self'"],
+      upgradeInsecureRequests: env.nodeEnv === 'production' ? [] : null,
+    },
+  },
+}));
 app.use(securityHeaders);
 app.use(requestLogger);
 app.use(express.static(path.join(__dirname, '..', 'public')));

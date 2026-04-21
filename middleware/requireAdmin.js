@@ -1,16 +1,17 @@
-function requireAdmin(req, res, next) {
+function adminAuth(req, res, next) {
   if (req.session && req.session.isAdmin) {
     next();
     return;
   }
 
   res.status(403).render('admin-login', {
-    title: 'Admin Login - Malawi Tourism Blog',
-    pageDescription: 'Administrator login for Malawi Tourism Blog.',
-    error: 'Admin login is required to delete posts.',
+    title: 'Admin Login - Malawi Hidden Gems',
+    pageDescription: 'Administrator login for Malawi Hidden Gems.',
+    error: 'Admin login is required to access the dashboard.',
   });
 }
 
 module.exports = {
-  requireAdmin,
+  requireAdmin: adminAuth,
+  adminAuth,
 };

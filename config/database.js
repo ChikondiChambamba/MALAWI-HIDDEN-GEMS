@@ -35,8 +35,12 @@ async function ensurePostsSchema() {
       title VARCHAR(255) NOT NULL,
       author_name VARCHAR(120) NOT NULL DEFAULT 'Anonymous traveler',
       location VARCHAR(120) DEFAULT NULL,
-      image_path VARCHAR(255) NOT NULL DEFAULT 'default.jpg',
+      image_path VARCHAR(500) NOT NULL DEFAULT 'default.jpg',
+      image_public_id VARCHAR(255) DEFAULT NULL,
+      editor_token VARCHAR(128) NOT NULL,
       content TEXT NOT NULL,
+      featured BOOLEAN NOT NULL DEFAULT FALSE,
+      featured_until DATETIME DEFAULT NULL,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
     )
@@ -64,15 +68,36 @@ async function ensurePostsSchema() {
     if (columns.has('image')) {
       await query(`
         ALTER TABLE posts
-        CHANGE COLUMN image image_path VARCHAR(255) NOT NULL DEFAULT 'default.jpg'
+        CHANGE COLUMN image image_path VARCHAR(500) NOT NULL DEFAULT 'default.jpg'
       `);
     } else {
       await query(`
         ALTER TABLE posts
-        ADD COLUMN image_path VARCHAR(255) NOT NULL DEFAULT 'default.jpg'
+        ADD COLUMN image_path VARCHAR(500) NOT NULL DEFAULT 'default.jpg'
         AFTER location
       `);
     }
+  }
+
+  await query(`
+    ALTER TABLE posts
+    MODIFY COLUMN image_path VARCHAR(500) NOT NULL DEFAULT 'default.jpg'
+  `);
+
+  if (!columns.has('image_public_id')) {
+    await query(`
+      ALTER TABLE posts
+      ADD COLUMN image_public_id VARCHAR(255) DEFAULT NULL
+      AFTER image_path
+    `);
+  }
+
+  if (!columns.has('editor_token')) {
+    await query(`
+      ALTER TABLE posts
+      ADD COLUMN editor_token VARCHAR(128) NOT NULL DEFAULT ''
+      AFTER image_public_id
+    `);
   }
 
   if (!columns.has('created_at')) {
@@ -97,6 +122,28 @@ async function ensurePostsSchema() {
       AFTER created_at
     `);
   }
+
+  if (!columns.has('featured')) {
+    await query(`
+      ALTER TABLE posts
+      ADD COLUMN featured BOOLEAN NOT NULL DEFAULT FALSE
+      AFTER content
+    `);
+  }
+
+  if (!columns.has('featured_until')) {
+    await query(`
+      ALTER TABLE posts
+      ADD COLUMN featured_until DATETIME DEFAULT NULL
+      AFTER featured
+    `);
+  }
+
+  await query(`
+    UPDATE posts
+    SET editor_token = SHA2(CONCAT('post-token-', id, '-', COALESCE(created_at, NOW())), 256)
+    WHERE editor_token = ''
+  `);
 }
 
 async function ensureContactsSchema() {
@@ -120,9 +167,48 @@ async function ensureContactsSchema() {
   }
 }
 
+async function ensureTagsSchema() {
+  await query(`
+    CREATE TABLE IF NOT EXISTS tags (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      name VARCHAR(120) NOT NULL UNIQUE,
+      slug VARCHAR(140) NOT NULL UNIQUE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+
+  await query(`
+    CREATE TABLE IF NOT EXISTS post_tags (
+      post_id INT NOT NULL,
+      tag_id INT NOT NULL,
+      PRIMARY KEY (post_id, tag_id),
+      CONSTRAINT fk_post_tags_post
+        FOREIGN KEY (post_id) REFERENCES posts(id)
+        ON DELETE CASCADE,
+      CONSTRAINT fk_post_tags_tag
+        FOREIGN KEY (tag_id) REFERENCES tags(id)
+        ON DELETE CASCADE
+    )
+  `);
+
+  await query(`
+    INSERT IGNORE INTO tags (name, slug)
+    VALUES
+      ('Northern Region', 'northern-region'),
+      ('Central Region', 'central-region'),
+      ('Southern Region', 'southern-region'),
+      ('Beach', 'beach'),
+      ('Wildlife', 'wildlife'),
+      ('Culture', 'culture'),
+      ('Food', 'food'),
+      ('Adventure', 'adventure')
+  `);
+}
+
 async function ensureSchema() {
   await ensurePostsSchema();
   await ensureContactsSchema();
+  await ensureTagsSchema();
 }
 
 async function closePool() {

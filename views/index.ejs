@@ -1,49 +1,141 @@
 <%- include('partials/header') %>
 
-<div class="hero">
-  <h2>Discover Malawi's Natural Beauty</h2>
-  <p>Explore the stunning landscapes, rich culture, and incredible wildlife of the Warm Heart of Africa.</p>
-  <a href="/posts/new" class="cta-button">Share Your Experience <i class="fas fa-arrow-right"></i></a>
-</div>
+<section class="hero">
+  <p class="hero-kicker">Malawi Hidden Gems</p>
+  <h2>Stories, tips, and unforgettable places across Malawi</h2>
+  <p>Browse traveler-submitted gems, search by keyword, and explore the regions, flavors, and adventures that make Malawi special.</p>
+  <div class="hero-actions">
+    <a href="/posts/new" class="cta-button">Share Your Experience</a>
+    <a href="/posts" class="btn secondary">Browse All Posts</a>
+  </div>
+</section>
 
-<% if (posts.length === 0) { %>
+<% if (isHomePage && featuredPost) { %>
+  <section class="featured-gem">
+    <div class="featured-gem__media">
+      <img src="<%= featuredPost.imageUrl %>" alt="<%= featuredPost.title %>">
+    </div>
+    <div class="featured-gem__content">
+      <p class="featured-gem__label">Hidden Gem of the Week 🌟</p>
+      <h2><a href="/posts/<%= featuredPost.id %>"><%= featuredPost.title %></a></h2>
+      <div class="post-meta">
+        <span><%= featuredPost.authorName %></span>
+        <% if (featuredPost.location) { %>
+          <span><%= featuredPost.location %></span>
+        <% } %>
+        <span><%= featuredPost.readTime %></span>
+      </div>
+      <% if (featuredPost.tags.length) { %>
+        <div class="tag-list">
+          <% featuredPost.tags.forEach((tag) => { %>
+            <a href="<%= buildTagUrl(tag.slug) %>" class="tag-pill"><%= tag.name %></a>
+          <% }) %>
+        </div>
+      <% } %>
+      <p class="post-excerpt"><%= featuredPost.excerpt %></p>
+      <a href="/posts/<%= featuredPost.id %>" class="btn primary">Read This Gem</a>
+    </div>
+  </section>
+<% } %>
+
+<section class="filter-panel">
+  <form action="/posts/search" method="GET" class="search-form">
+    <label for="searchQuery" class="visually-hidden">Search posts</label>
+    <input
+      type="search"
+      id="searchQuery"
+      name="q"
+      value="<%= searchQuery %>"
+      placeholder="Search by title or story content"
+    >
+    <% if (activeTag) { %>
+      <input type="hidden" name="tag" value="<%= activeTag.slug %>">
+    <% } %>
+    <button type="submit" class="btn primary">Search</button>
+  </form>
+
+  <div class="tag-filter-bar">
+    <a href="/posts" class="tag-filter <%= !activeTag ? 'is-active' : '' %>">All</a>
+    <% tags.forEach((tag) => { %>
+      <a href="<%= buildTagUrl(tag.slug) %>" class="tag-filter <%= activeTag && activeTag.slug === tag.slug ? 'is-active' : '' %>">
+        <%= tag.name %>
+      </a>
+    <% }) %>
+  </div>
+
+  <div class="results-summary">
+    <p><%= totalMatchesLabel %></p>
+    <% if (searchQuery || activeTag) { %>
+      <a href="<%= clearFiltersUrl %>" class="btn secondary">Clear Filters</a>
+    <% } %>
+  </div>
+</section>
+
+<% if (!posts.length) { %>
   <div class="empty-state">
-    <h3>No posts yet</h3>
-    <p>Be the first to share your Malawi experience!</p>
-    <a href="/posts/new" class="btn primary">Create First Post</a>
+    <h3>No gems found</h3>
+    <p><%= noResultsMessage %></p>
+    <a href="/posts/new" class="btn primary">Create a Post</a>
   </div>
 <% } else { %>
-  <h2 class="section-title">Latest Posts</h2>
+  <h2 class="section-title"><%= isHomePage ? 'Latest Hidden Gems' : 'Explore Hidden Gems' %></h2>
 
   <div class="posts-grid">
     <% posts.forEach((post) => { %>
       <article class="post-card">
         <div class="post-image">
-          <img src="/images/<%= post.imagePath %>" alt="<%= post.title %>">
+          <img src="<%= post.imageUrl %>" alt="<%= post.title %>">
         </div>
         <div class="post-content">
           <h3><a href="/posts/<%= post.id %>"><%= post.title %></a></h3>
           <div class="post-meta">
-            <span><i class="far fa-user"></i> <%= post.authorName %></span>
+            <span><%= post.authorName %></span>
             <% if (post.location) { %>
-              <span><i class="fas fa-map-marker-alt"></i> <%= post.location %></span>
+              <span><%= post.location %></span>
             <% } %>
-            <span><i class="far fa-calendar"></i> <%= new Date(post.createdAt).toDateString() %></span>
+            <span><%= new Date(post.createdAt).toDateString() %></span>
+            <span><%= post.readTime %></span>
           </div>
+          <% if (post.tags.length) { %>
+            <div class="tag-list">
+              <% post.tags.forEach((tag) => { %>
+                <a href="<%= buildTagUrl(tag.slug) %>" class="tag-pill"><%= tag.name %></a>
+              <% }) %>
+            </div>
+          <% } %>
           <p class="post-excerpt"><%= post.excerpt %></p>
           <div class="post-actions">
-            <a href="/posts/<%= post.id %>" class="btn primary"><i class="fas fa-book-reader"></i> Read More</a>
-            <a href="/posts/<%= post.id %>/edit" class="btn secondary"><i class="fas fa-edit"></i> Edit</a>
-            <% if (isAdmin) { %>
-              <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form">
-                <button type="submit" class="btn danger"><i class="fas fa-trash"></i> Delete</button>
+            <a href="/posts/<%= post.id %>" class="btn primary">Read More</a>
+            <div class="editor-controls" data-post-id="<%= post.id %>">
+              <a href="/posts/<%= post.id %>/edit" class="btn secondary editor-edit-link">Edit</a>
+              <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form editor-delete-form" data-post-id="<%= post.id %>">
+                <input type="hidden" name="editorToken" class="editor-token-field">
+                <button type="submit" class="btn danger">Delete</button>
               </form>
-            <% } %>
+            </div>
           </div>
         </div>
       </article>
     <% }) %>
   </div>
+
+  <% if (pagination.totalPages > 1) { %>
+    <nav class="pagination" aria-label="Pagination">
+      <% if (pagination.hasPreviousPage) { %>
+        <a href="<%= pagination.previousPageUrl %>" class="btn secondary">Previous</a>
+      <% } else { %>
+        <span class="btn secondary is-disabled">Previous</span>
+      <% } %>
+
+      <span class="pagination-status">Page <%= pagination.currentPage %> of <%= pagination.totalPages %></span>
+
+      <% if (pagination.hasNextPage) { %>
+        <a href="<%= pagination.nextPageUrl %>" class="btn secondary">Next</a>
+      <% } else { %>
+        <span class="btn secondary is-disabled">Next</span>
+      <% } %>
+    </nav>
+  <% } %>
 <% } %>
 
 <%- include('partials/footer') %>

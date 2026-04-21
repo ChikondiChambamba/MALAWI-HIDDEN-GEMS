@@ -1,20 +1,43 @@
 <%- include('partials/header') %>
 
 <article class="full-post">
+  <% if (issuedEditorToken) { %>
+    <div
+      class="success-message editor-token-notice"
+      data-issued-editor-token="<%= issuedEditorToken %>"
+      data-issued-post-id="<%= post.id %>"
+    >
+      <div>
+        <strong>Your editor token has been saved in this browser.</strong>
+        <p>Keep this token safe if you want a backup for editing or deleting this post later.</p>
+        <code><%= issuedEditorToken %></code>
+      </div>
+    </div>
+  <% } %>
+
   <h2><%= post.title %></h2>
 
   <div class="post-meta">
-    <span><i class="far fa-user"></i> <%= post.authorName %></span>
+    <span><%= post.authorName %></span>
     <% if (post.location) { %>
-      <span><i class="fas fa-map-marker-alt"></i> <%= post.location %></span>
+      <span><%= post.location %></span>
     <% } %>
-    <span><i class="far fa-calendar"></i> Shared on <%= new Date(post.createdAt).toDateString() %></span>
-    <span><i class="fas fa-pen"></i> Updated <%= new Date(post.updatedAt).toDateString() %></span>
+    <span>Shared on <%= new Date(post.createdAt).toDateString() %></span>
+    <span>Updated <%= new Date(post.updatedAt).toDateString() %></span>
+    <span><%= post.readTime %></span>
   </div>
+
+  <% if (post.tags.length) { %>
+    <div class="tag-list">
+      <% post.tags.forEach((tag) => { %>
+        <a href="/posts?tag=<%= tag.slug %>" class="tag-pill"><%= tag.name %></a>
+      <% }) %>
+    </div>
+  <% } %>
 
   <% if (post.imagePath && post.imagePath !== 'default.jpg') { %>
     <div class="post-image">
-      <img src="/images/<%= post.imagePath %>" alt="<%= post.title %>">
+      <img src="<%= post.imageUrl %>" alt="<%= post.title %>">
     </div>
   <% } %>
 
@@ -23,19 +46,14 @@
   </div>
 
   <div class="post-actions">
-    <a href="/posts" class="btn secondary">
-      <i class="fas fa-arrow-left"></i> Back to All Experiences
-    </a>
-    <a href="/posts/<%= post.id %>/edit" class="btn primary">
-      <i class="fas fa-edit"></i> Edit This Experience
-    </a>
-    <% if (isAdmin) { %>
-      <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form">
-        <button type="submit" class="btn danger">
-          <i class="fas fa-trash"></i> Delete Experience
-        </button>
+    <a href="/posts" class="btn secondary">Back to All Experiences</a>
+    <div class="editor-controls" data-post-id="<%= post.id %>">
+      <a href="/posts/<%= post.id %>/edit" class="btn primary editor-edit-link">Edit This Experience</a>
+      <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form editor-delete-form" data-post-id="<%= post.id %>">
+        <input type="hidden" name="editorToken" class="editor-token-field">
+        <button type="submit" class="btn danger">Delete Experience</button>
       </form>
-    <% } %>
+    </div>
   </div>
 </article>
 

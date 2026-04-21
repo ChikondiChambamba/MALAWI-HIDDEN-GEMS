@@ -1,13 +1,13 @@
 <%- include('partials/header') %>
 
 <section class="form-section admin-panel">
-  <h2><i class="fas fa-user-shield"></i> Admin Dashboard</h2>
-  <p>Review published posts and remove any that should no longer appear on the site.</p>
+  <h2>Admin Dashboard</h2>
+  <p>Moderate posts, review tags, and choose the next Hidden Gem of the Week.</p>
 
   <div class="form-actions admin-toolbar">
-    <a href="/posts" class="btn secondary"><i class="fas fa-home"></i> Back to Site</a>
+    <a href="/posts" class="btn secondary">Back to Site</a>
     <form action="/admin/logout" method="POST">
-      <button type="submit" class="btn danger"><i class="fas fa-sign-out-alt"></i> Logout</button>
+      <button type="submit" class="btn danger">Logout</button>
     </form>
   </div>
 
@@ -20,22 +20,38 @@
     <div class="admin-post-list">
       <% posts.forEach((post) => { %>
         <article class="admin-post-item">
+          <div class="admin-post-item__media">
+            <img src="<%= post.imageUrl %>" alt="<%= post.title %>">
+          </div>
           <div class="admin-post-item__content">
             <h3><a href="/posts/<%= post.id %>"><%= post.title %></a></h3>
             <div class="post-meta">
-              <span><i class="far fa-user"></i> <%= post.authorName %></span>
+              <span><%= post.authorName %></span>
               <% if (post.location) { %>
-                <span><i class="fas fa-map-marker-alt"></i> <%= post.location %></span>
+                <span><%= post.location %></span>
               <% } %>
-              <span><i class="far fa-calendar"></i> <%= new Date(post.createdAt).toDateString() %></span>
+              <span><%= new Date(post.createdAt).toDateString() %></span>
+              <span><%= post.readTime %></span>
             </div>
+            <% if (post.tags.length) { %>
+              <div class="tag-list">
+                <% post.tags.forEach((tag) => { %>
+                  <span class="tag-pill"><%= tag.name %></span>
+                <% }) %>
+              </div>
+            <% } %>
+            <% if (post.featured && post.featuredUntil) { %>
+              <p class="featured-status">Featured until <%= new Date(post.featuredUntil).toDateString() %></p>
+            <% } %>
             <p class="post-excerpt"><%= post.excerpt %></p>
           </div>
           <div class="admin-post-item__actions">
-            <a href="/posts/<%= post.id %>" class="btn secondary"><i class="fas fa-eye"></i> View</a>
-            <a href="/posts/<%= post.id %>/edit" class="btn primary"><i class="fas fa-edit"></i> Edit</a>
-            <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form">
-              <button type="submit" class="btn danger"><i class="fas fa-trash"></i> Delete</button>
+            <a href="/posts/<%= post.id %>" class="btn secondary">View</a>
+            <form action="/admin/posts/<%= post.id %>/feature" method="POST">
+              <button type="submit" class="btn primary">Feature This Post</button>
+            </form>
+            <form action="/admin/posts/<%= post.id %>/delete" method="POST" class="delete-form">
+              <button type="submit" class="btn danger">Delete</button>
             </form>
           </div>
         </article>

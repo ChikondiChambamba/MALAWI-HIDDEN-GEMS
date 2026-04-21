@@ -1,4 +1,16 @@
-const { escapeHtml, sanitizePlainText } = require('./text');
+const { sanitizePlainText, sanitizeRichText, stripMarkup } = require('./text');
+
+function normalizeTagSlugs(value) {
+  const rawValues = Array.isArray(value)
+    ? value
+    : (typeof value === 'undefined' || value === null ? [] : [value]);
+
+  return [...new Set(
+    rawValues
+      .map((entry) => sanitizePlainText(entry, 120).toLowerCase())
+      .filter(Boolean)
+  )];
+}
 
 function chooseValue(primaryValue, fallbackValue = '') {
   return typeof primaryValue === 'string' ? primaryValue : fallbackValue;
@@ -14,10 +26,10 @@ function buildPostFormData(source = {}, file = null, fallback = {}) {
     title: sanitizePlainText(title, 255),
     authorName: sanitizePlainText(authorName, 120) || 'Anonymous traveler',
     location: sanitizePlainText(location, 120),
-    content: typeof content === 'string' ? content.trim() : '',
-    imagePath: file
-      ? `uploads/${file.filename}`
-      : (source.imagePath || fallback.imagePath || 'default.jpg'),
+    content: sanitizeRichText(content, 25000),
+    imagePath: source.imagePath || fallback.imagePath || 'default.jpg',
+    tagSlugs: normalizeTagSlugs(source.tagSlugs || source.tags || fallback.tagSlugs || []),
+    imageFile: file || null,
   };
 }
 
@@ -35,8 +47,8 @@ function validatePostPayload(post) {
   };
 }
 
-function buildExcerpt(content = '', maxLength = 170) {
-  const normalized = content.replace(/\s+/g, ' ').trim();
+function buildExcerpt(content = '', maxLength = 150) {
+  const normalized = stripMarkup(content).replace(/\s+/g, ' ').trim();
 
   if (normalized.length <= maxLength) {
     return normalized;
@@ -46,10 +58,42 @@ function buildExcerpt(content = '', maxLength = 170) {
 }
 
 function formatPostContent(content = '') {
-  return escapeHtml(content)
+  const sanitizedContent = sanitizeRichText(content, 25000);
+
+  if (!sanitizedContent) {
+    return '';
+  }
+
+  if (/<\/?(p|ul|li|br|a|b|i|em|strong)\b/i.test(sanitizedContent)) {
+    return sanitizedContent;
+  }
+
+  return sanitizedContent
     .split(/\n{2,}/)
     .map((paragraph) => `<p>${paragraph.replace(/\n/g, '<br>')}</p>`)
     .join('');
+}
+
+function calculateReadTime(content = '') {
+  const plainText = stripMarkup(content).replace(/\s+/g, ' ').trim();
+  const words = plainText ? plainText.split(' ').length : 0;
+  const minutes = Math.max(1, Math.ceil(words / 200));
+
+  return `${minutes} min read`;
+}
+
+function resolveImageUrl(imagePath = '') {
+  if (!imagePath || imagePath === 'default.jpg') {
+    return '/images/default.jpg';
+  }
+
+  if (/^https?:\/\//i.test(imagePath)) {
+    return imagePath;
+  }
+
+  return imagePath.startsWith('/images/')
+    ? imagePath
+    : `/images/${imagePath.replace(/^\/+/, '')}`;
 }
 
 module.exports = {
@@ -57,4 +101,6 @@ module.exports = {
   validatePostPayload,
   buildExcerpt,
   formatPostContent,
+  calculateReadTime,
+  resolveImageUrl,
 };
