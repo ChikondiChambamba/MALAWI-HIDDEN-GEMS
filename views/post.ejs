@@ -1,40 +1,42 @@
 <%- include('partials/header') %>
 
-    <article class="full-post">
-        <h2><%= post.title %></h2>
-        
-        <p class="post-meta">
-            <i class="far fa-calendar"></i> 
-            <% if (post.createdAt) { %>
-                Shared on <%= new Date(post.createdAt).toDateString() %>
-            <% } else { %>
-                Recently shared
-            <% } %>
-        </p>
-        
-        <% if (post.image && post.image !== 'default.jpg') { %>
-        <div class="post-image">
-            <img src="/images/<%= post.image %>" alt="<%= post.title %>">
-        </div>
-        <% } %>
-        
-        <div class="post-content">
-            <%- post.content %>
-        </div>
-        
-        <div class="post-actions">
-            <a href="/" class="btn secondary">
-                <i class="fas fa-arrow-left"></i> Back to All Experiences
-            </a>
-            <a href="/posts/<%= post.id %>/edit" class="btn primary">
-                <i class="fas fa-edit"></i> Edit This Experience
-            </a>
-            <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form">
-                <button type="submit" class="btn danger" onclick="return confirm('Are you sure you want to delete this experience? This cannot be undone.')">
-                    <i class="fas fa-trash"></i> Delete Experience
-                </button>
-            </form>
-        </div>
-    </article>
+<article class="full-post">
+  <h2><%= post.title %></h2>
+
+  <div class="post-meta">
+    <span><i class="far fa-user"></i> <%= post.authorName %></span>
+    <% if (post.location) { %>
+      <span><i class="fas fa-map-marker-alt"></i> <%= post.location %></span>
+    <% } %>
+    <span><i class="far fa-calendar"></i> Shared on <%= new Date(post.createdAt).toDateString() %></span>
+    <span><i class="fas fa-pen"></i> Updated <%= new Date(post.updatedAt).toDateString() %></span>
+  </div>
+
+  <% if (post.imagePath && post.imagePath !== 'default.jpg') { %>
+    <div class="post-image">
+      <img src="/images/<%= post.imagePath %>" alt="<%= post.title %>">
+    </div>
+  <% } %>
+
+  <div class="post-content">
+    <%- post.formattedContent %>
+  </div>
+
+  <div class="post-actions">
+    <a href="/posts" class="btn secondary">
+      <i class="fas fa-arrow-left"></i> Back to All Experiences
+    </a>
+    <a href="/posts/<%= post.id %>/edit" class="btn primary">
+      <i class="fas fa-edit"></i> Edit This Experience
+    </a>
+    <% if (isAdmin) { %>
+      <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form">
+        <button type="submit" class="btn danger">
+          <i class="fas fa-trash"></i> Delete Experience
+        </button>
+      </form>
+    <% } %>
+  </div>
+</article>
 
 <%- include('partials/footer') %>

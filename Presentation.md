@@ -32,8 +32,8 @@
   - Log in: `mysql -u root -p`
   - SQL Commands:
     ```sql
-    CREATE DATABASE blog_app;
-    USE blog_app;
+    CREATE DATABASE malawi_Tourism;
+    USE malawi_Tourism;
     ```
 
 - **Step 3: Create Tables**
@@ -75,7 +75,7 @@
 
 
 ## Slide 6: Section 4 - Integrating Database Operations for Blog Posts (CRUD)
-- **Overview**: Replace in-memory arrays with SQL queries for posts.
+
 - **Create (POST /posts)**: Handle form submission, upload image, insert into DB.
   - Code: Use `pool.query('INSERT INTO posts ...')` in an async route.
 
@@ -88,6 +88,7 @@
 - **Delete (DELETE /posts/:id)**: Remove from DB.
   - Code: `await pool.query('DELETE FROM posts WHERE id = ?', [id]);`
 
-- **Integration Tips**: Use async/await for routes, handle errors with try-catch, validate inputs.
 
+## Thank You!
 
+## Questions

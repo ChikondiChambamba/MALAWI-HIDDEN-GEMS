@@ -1,0 +1,32 @@
+<%- include('partials/header') %>
+
+<section class="form-section">
+  <h2><i class="fas fa-user-shield"></i> Admin Login</h2>
+  <p>Only admins can delete published posts.</p>
+
+  <% if (typeof error !== 'undefined') { %>
+    <div class="error-message">
+      <i class="fas fa-exclamation-circle"></i>
+      <p><%= error %></p>
+    </div>
+  <% } %>
+
+  <form action="/admin/login" method="POST">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" required>
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn primary"><i class="fas fa-sign-in-alt"></i> Login</button>
+      <a href="/posts" class="btn secondary"><i class="fas fa-times"></i> Cancel</a>
+    </div>
+  </form>
+</section>
+
+<%- include('partials/footer') %>

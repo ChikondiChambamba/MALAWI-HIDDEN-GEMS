@@ -1,48 +1,57 @@
-<%- include ('partials/header') %>
-  <%- include('partials/navigation') %>
+<%- include('partials/header') %>
 
-  <section>
-    <h2><i class="fas fa-edit"></i>Edit Post</h2>
+<section class="form-section">
+  <h2><i class="fas fa-edit"></i> Edit Post</h2>
 
-    <% if (typeof error !== 'undefined') { %>
-      <div class="error-message">
-        <i class="fas fa-exclamation-triangle"></i>
-        <p><%= error %></p>
+  <% if (typeof error !== 'undefined') { %>
+    <div class="error-message">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p><%= error %></p>
+    </div>
+  <% } %>
+
+  <form action="/posts/<%= post.id %>?_method=PUT" method="POST" class="post-form" enctype="multipart/form-data">
+    <div class="form-group">
+      <label for="title">Title:</label>
+      <input type="text" id="title" name="title" value="<%= form.title %>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="authorName">Your Name:</label>
+      <input type="text" id="authorName" name="authorName" value="<%= form.authorName %>" placeholder="Anonymous traveler">
+    </div>
+
+    <div class="form-group">
+      <label for="location">Location in Malawi:</label>
+      <input type="text" id="location" name="location" value="<%= form.location %>" placeholder="Cape Maclear, Mulanje, Zomba...">
+    </div>
+
+    <div class="form-group">
+      <label for="image">Blog Image:</label>
+      <% if (post.imagePath) { %>
+        <div class="existing-images">
+          <div class="existing-thumb">
+            <img src="/images/<%= post.imagePath %>" alt="Current image">
+          </div>
+        </div>
+      <% } %>
+      <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif,.webp,image/*">
+      <div class="preview-stack" id="imagePreview" aria-hidden="true">
+        <img src="" alt="Selected image preview" id="imagePreviewTag" class="preview-image is-hidden">
       </div>
-    <% } %>
-    
-    <!-- Image upload field with preview and remove option -->
-<form action="/posts/<%= post.id %>?_method=PUT" method="POST" enctype="multipart/form-data">
-  <!-- ... other fields ... -->
-  <div class="form-group">
-    <label for="image">Blog Image:</label>
-    <% if (post.image && post.image !== 'default.jpg') { %>
-      <div>
-        <img src="/images/<%= post.image %>" alt="Current image" style="max-width: 200px; margin-bottom: 10px;">
-      </div>
+      <small>Leave empty to keep the current image</small>
+    </div>
 
-    <% } %>
-    <input type="file" id="image" name="image" accept="image/*">
-    <small>Select a new image for your blog post (JPG, PNG, or GIF, max 5MB)</small>
-  </div>
+    <div class="form-group">
+      <label for="content">Content:</label>
+      <textarea id="content" name="content" rows="10" required><%= form.content %></textarea>
+    </div>
 
-</form>
+    <div class="form-actions">
+      <button type="submit" class="btn primary"><i class="fas fa-check"></i> Update Post</button>
+      <a href="/posts/<%= post.id %>" class="btn secondary"><i class="fas fa-times"></i> Cancel</a>
+    </div>
+  </form>
+</section>
 
-    <form action="/posts/<%= post.id %>?_method=PUT" method="POST" class="post-form">
-      <div class="form-group">
-        <label for="title">Title:</label>
-        <input type="text" id="title" name="title" value="<%= typeof post.title !== 'undefined' ? post.title : '' %>" required>
-      </div>
-
-      <div class="form-group">
-        <label for="content">Content:</label>
-        <textarea id="content" name="content" rows="10" required><%= typeof post.content !== 'undefined' ? post.content : '' %></textarea>
-      </div>
-
-      <div class="form-actions">
-        <button type="submit" class="btn primary"><i class="fas fa-check"></i>Update Post</button>
-        <a href="/" class="btn secondary"><i class="fas fa-times"></i>Cancel</a>
-      </div>
-    </form>
-  </section>
 <%- include('partials/footer') %>

@@ -1,7 +1,7 @@
-<%- include ('partials/header') %>
+<%- include('partials/header') %>
 
-<section>
-  <h2><i class="fas fa-plus"></i>Create New Post</h2>
+<section class="form-section">
+  <h2><i class="fas fa-plus"></i> Create New Post</h2>
 
   <% if (typeof error !== 'undefined') { %>
     <div class="error-message">
@@ -9,27 +9,40 @@
       <p><%= error %></p>
     </div>
   <% } %>
-  
+
   <form action="/posts" method="POST" class="post-form" enctype="multipart/form-data">
     <div class="form-group">
       <label for="title">Title:</label>
-      <input type="text" id="title" name="title" value="<%= typeof title !== 'undefined' ? title : '' %>" required>
+      <input type="text" id="title" name="title" value="<%= form.title %>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="authorName">Your Name:</label>
+      <input type="text" id="authorName" name="authorName" value="<%= form.authorName %>" placeholder="Anonymous traveler">
+    </div>
+
+    <div class="form-group">
+      <label for="location">Location in Malawi:</label>
+      <input type="text" id="location" name="location" value="<%= form.location %>" placeholder="Cape Maclear, Mulanje, Zomba...">
     </div>
 
     <div class="form-group">
       <label for="image">Blog Image:</label>
-      <input type="file" id="image" name="image" accept="image/*">
-      <small>Select an image for your blog post (JPG, PNG, or GIF, max 5MB)</small>
+      <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif,.webp,image/*">
+      <div class="preview-stack" id="imagePreview" aria-hidden="true">
+        <img src="" alt="Selected image preview" id="imagePreviewTag" class="preview-image is-hidden">
+      </div>
+      <small>Select an image for your blog post (JPG, PNG, GIF, or WEBP, max 5MB)</small>
     </div>
 
     <div class="form-group">
       <label for="content">Content:</label>
-      <textarea id="content" name="content" rows="10" required><%= typeof content !== 'undefined' ? content : (typeof post !== 'undefined' && post.content ? post.content : '') %></textarea>  
+      <textarea id="content" name="content" rows="10" required><%= form.content %></textarea>
     </div>
-    
+
     <div class="form-actions">
-      <button type="submit" class="btn primary"><i class="fas fa-check"></i>Create Post</button>
-      <a href="/" class="btn secondary"><i class="fas fa-times"></i>Cancel</a>
+      <button type="submit" class="btn primary"><i class="fas fa-check"></i> Create Post</button>
+      <a href="/posts" class="btn secondary"><i class="fas fa-times"></i> Cancel</a>
     </div>
   </form>
 </section>

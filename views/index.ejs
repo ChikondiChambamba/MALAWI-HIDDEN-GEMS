@@ -1,45 +1,49 @@
 <%- include('partials/header') %>
 
-    <div class="hero">
-        <h2>Discover Malawi's Natural Beauty</h2>
-        <p>Explore the stunning landscapes, rich culture, and incredible wildlife of the Warm Heart of Africa.</p>
-        <a href="/posts/new" class="cta-button">Share Your Experience <i class="fas fa-arrow-right"></i></a>
-    </div>
+<div class="hero">
+  <h2>Discover Malawi's Natural Beauty</h2>
+  <p>Explore the stunning landscapes, rich culture, and incredible wildlife of the Warm Heart of Africa.</p>
+  <a href="/posts/new" class="cta-button">Share Your Experience <i class="fas fa-arrow-right"></i></a>
+</div>
 
-    <% if (posts.length === 0) { %>
-        <div class="empty-state">
-            <h3>No posts yet</h3>
-            <p>Be the first to share your Malawi experience!</p>
-            <a href="/posts/new" class="btn">Create First Post</a>
+<% if (posts.length === 0) { %>
+  <div class="empty-state">
+    <h3>No posts yet</h3>
+    <p>Be the first to share your Malawi experience!</p>
+    <a href="/posts/new" class="btn primary">Create First Post</a>
+  </div>
+<% } else { %>
+  <h2 class="section-title">Latest Posts</h2>
+
+  <div class="posts-grid">
+    <% posts.forEach((post) => { %>
+      <article class="post-card">
+        <div class="post-image">
+          <img src="/images/<%= post.imagePath %>" alt="<%= post.title %>">
         </div>
-        
-    <% } else { %>
-        <h2 class="section-title">Latest Posts</h2>
-        
-        <div class="posts-grid">
-            <% posts.forEach(post => { %>
-                <article class="post-card">
-                    <div class="post-image">
-                        <img src="/images/<%= post.image || 'default.jpg' %>" alt="<%= post.title %>">
-                    </div>
-                    <div class="post-content">
-                        <h3><a href="/posts/<%= post.id %>"><%= post.title %></a></h3>
-                        <p class="post-meta"><i class="far fa-calendar"></i> <%= post.createdAt.toDateString() %></p>
-                        <p class="post-excerpt">
-                            <%= post.content.substring(0, 150) %>
-                            <% if (post.content.length > 150) { %>...<% } %>
-                        </p>
-                        <div class="post-actions">
-                            <a href="/posts/<%= post.id %>" class="btn primary"><i class="fas fa-book-reader"></i> Read More</a>
-                            <a href="/posts/<%= post.id %>/edit" class="btn secondary"><i class="fas fa-edit"></i> Edit</a>
-                            <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form">
-                                <button type="submit" class="btn danger"><i class="fas fa-trash"></i> Delete</button>
-                            </form>
-                        </div>
-                    </div>
-                </article>
-            <% }) %>
+        <div class="post-content">
+          <h3><a href="/posts/<%= post.id %>"><%= post.title %></a></h3>
+          <div class="post-meta">
+            <span><i class="far fa-user"></i> <%= post.authorName %></span>
+            <% if (post.location) { %>
+              <span><i class="fas fa-map-marker-alt"></i> <%= post.location %></span>
+            <% } %>
+            <span><i class="far fa-calendar"></i> <%= new Date(post.createdAt).toDateString() %></span>
+          </div>
+          <p class="post-excerpt"><%= post.excerpt %></p>
+          <div class="post-actions">
+            <a href="/posts/<%= post.id %>" class="btn primary"><i class="fas fa-book-reader"></i> Read More</a>
+            <a href="/posts/<%= post.id %>/edit" class="btn secondary"><i class="fas fa-edit"></i> Edit</a>
+            <% if (isAdmin) { %>
+              <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form">
+                <button type="submit" class="btn danger"><i class="fas fa-trash"></i> Delete</button>
+              </form>
+            <% } %>
+          </div>
         </div>
-    <% } %>
+      </article>
+    <% }) %>
+  </div>
+<% } %>
 
 <%- include('partials/footer') %>

@@ -1,65 +1,65 @@
 <%- include('partials/header') %>
 
-    <section class="form-section">
-        <h2><i class="fas fa-envelope"></i> Contact Us</h2>
-        <p>Have questions about Malawi tourism? Want to share your experiences? We'd love to hear from you!</p>
-        
-        <% if (typeof error !== 'undefined') { %>
-            <div class="error-message">
-                <i class="fas fa-exclamation-circle"></i>
-                <p><%= error %></p>
-            </div>
-        <% } %>
-        
-        <% if (typeof success !== 'undefined') { %>
-            <div class="success-message">
-                <i class="fas fa-check-circle"></i>
-                <p><%= success %></p>
-            </div>
-        <% } %>
+<section class="form-section">
+  <h2><i class="fas fa-envelope"></i> Contact Us</h2>
+  <p>Have questions about Malawi tourism? Want to share your experiences? We'd love to hear from you!</p>
 
-        <form action="/contact" method="POST">
-            <div class="form-group">
-                <label for="name">Your Name</label>
-                <input type="text" id="name" name="name" value="<%= typeof formData !== 'undefined' ? formData.name : '' %>" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" value="<%= typeof formData !== 'undefined' ? formData.email : '' %>" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="message">Message</label>
-                <textarea id="message" name="message" rows="6" required><%= typeof formData !== 'undefined' ? formData.message : '' %></textarea>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn primary"><i class="fas fa-paper-plane"></i> Send Message</button>
-                <a href="/" class="btn secondary"><i class="fas fa-times"></i> Cancel</a>
-            </div>
-        </form>
-    </section>
+  <% if (typeof error !== 'undefined') { %>
+    <div class="error-message">
+      <i class="fas fa-exclamation-circle"></i>
+      <p><%= error %></p>
+    </div>
+  <% } %>
 
-    <section class="contact-info">
-        <h3>Other Ways to Reach Us</h3>
-        <div class="contact-methods">
-            <div class="contact-method">
-                <i class="fas fa-envelope"></i>
-                <h4>Email</h4>
-                <p>info@malawitourism.com</p>
-            </div>
-            <div class="contact-method">
-                <i class="fas fa-phone"></i>
-                <h4>Phone</h4>
-                <p>+265 885 040 112</p>
-            </div>
-            <div class="contact-method">
-                <i class="fas fa-map-marker-alt"></i>
-                <h4>Address</h4>
-                <p>Tourism House<br>Lilongwe, Malawi</p>
-            </div>
-        </div>
-    </section>
+  <% if (typeof success !== 'undefined') { %>
+    <div class="success-message">
+      <i class="fas fa-check-circle"></i>
+      <p><%= success %></p>
+    </div>
+  <% } %>
+
+  <form action="/contact" method="POST">
+    <div class="form-group">
+      <label for="name">Your Name</label>
+      <input type="text" id="name" name="name" value="<%= form.name %>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="email">Email Address</label>
+      <input type="email" id="email" name="email" value="<%= form.email %>" required>
+    </div>
+
+    <div class="form-group">
+      <label for="message">Message</label>
+      <textarea id="message" name="message" rows="6" required><%= form.message %></textarea>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn primary"><i class="fas fa-paper-plane"></i> Send Message</button>
+      <a href="/posts" class="btn secondary"><i class="fas fa-times"></i> Cancel</a>
+    </div>
+  </form>
+</section>
+
+<section class="contact-info">
+  <h3>Other Ways to Reach Us</h3>
+  <div class="contact-methods">
+    <div class="contact-method">
+      <i class="fas fa-envelope"></i>
+      <h4>Email</h4>
+      <p>info@malawitourism.com</p>
+    </div>
+    <div class="contact-method">
+      <i class="fas fa-phone"></i>
+      <h4>Phone</h4>
+      <p>+265 885 040 112</p>
+    </div>
+    <div class="contact-method">
+      <i class="fas fa-map-marker-alt"></i>
+      <h4>Address</h4>
+      <p>Tourism House<br>Lilongwe, Malawi</p>
+    </div>
+  </div>
+</section>
 
 <%- include('partials/footer') %>

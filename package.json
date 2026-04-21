@@ -1,11 +1,13 @@
 {
-  "name": "malawi-blog",
+  "name": "malawi-tourism-blog",
   "version": "1.0.0",
-  "description": "A dynamic blog about Malawi's natural beauty",
+  "description": "Anonymous travel stories and reviews about Malawi built with Express, EJS, and MySQL.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "init-db": "node scripts/init-db.js",
+    "check": "node --check app.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
