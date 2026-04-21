@@ -62,7 +62,7 @@ const env = {
   databaseUrl: buildDatabaseUrl(),
   maxUploadSizeBytes: optionalNumber('MAX_UPLOAD_SIZE_BYTES', 5 * 1024 * 1024),
   sessionSecret: required('SESSION_SECRET'),
-  adminPassword: required('ADMIN_PASSWORD'),
+  adminPasswordHash: required('ADMIN_PASSWORD_HASH'),
   siteUrl: (process.env.SITE_URL || 'http://localhost:3000').replace(/\/+$/, ''),
   cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME || '',
   cloudinaryApiKey: process.env.CLOUDINARY_API_KEY || '',

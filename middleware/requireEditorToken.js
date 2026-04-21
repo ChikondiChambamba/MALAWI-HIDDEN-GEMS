@@ -1,23 +1,8 @@
 const Post = require('../models/postModel');
-
-function extractEditorToken(req) {
-  if (typeof req.body?.editorToken === 'string' && req.body.editorToken.trim()) {
-    return req.body.editorToken.trim();
-  }
-
-  if (typeof req.query?.editorToken === 'string' && req.query.editorToken.trim()) {
-    return req.query.editorToken.trim();
-  }
-
-  if (typeof req.headers['x-editor-token'] === 'string' && req.headers['x-editor-token'].trim()) {
-    return req.headers['x-editor-token'].trim();
-  }
-
-  return '';
-}
+const { getEditorTokenFromRequest } = require('../utils/editorTokenCookie');
 
 async function requireEditorToken(req, res, next) {
-  const editorToken = extractEditorToken(req);
+  const editorToken = getEditorTokenFromRequest(req, req.params.id);
 
   if (!editorToken) {
     const error = new Error('A valid editor token is required to modify this post.');

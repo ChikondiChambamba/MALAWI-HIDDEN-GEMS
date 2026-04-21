@@ -27,9 +27,9 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'"],
-      styleSrc: ["'self'", 'fonts.googleapis.com'],
-      imgSrc: ["'self'", 'data:', 'https://res.cloudinary.com', 'https://*.basemaps.cartocdn.com'],
+      scriptSrc: ["'self'", 'unpkg.com'],
+      styleSrc: ["'self'", 'fonts.googleapis.com', 'unpkg.com'],
+      imgSrc: ["'self'", 'data:', 'https://res.cloudinary.com', 'https://*.basemaps.cartocdn.com', 'unpkg.com'],
       fontSrc: ["'self'", 'fonts.gstatic.com'],
       connectSrc: ["'self'"],
       workerSrc: ["'self'"],
@@ -45,7 +45,6 @@ app.use(helmet({
 app.use(securityHeaders);
 app.use(requestLogger);
 app.use(compression());
-app.use('/vendor/leaflet', express.static(path.join(__dirname, '..', 'node_modules', 'leaflet', 'dist')));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -68,6 +67,7 @@ app.use((req, res, next) => {
   res.locals.currentUrl = `${env.siteUrl}${req.originalUrl}`;
   res.locals.seo = null;
   res.locals.structuredData = [];
+  res.locals.needsLeaflet = false;
   next();
 });
 

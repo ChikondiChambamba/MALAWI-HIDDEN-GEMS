@@ -1,18 +1,10 @@
 # Malawi Hidden Gems
 
-[Live Demo](https://your-app-url.com)
-
 Malawi Hidden Gems is a production-oriented tourism discovery platform built with Express.js, EJS, Prisma ORM, MySQL, Tailwind CSS, and Cloudinary. The app is optimized for low-bandwidth environments with offline-ready caching, lightweight mapping, responsive media delivery, dynamic SEO metadata, and an Apple-inspired premium interface.
-
-## Screenshots
-
-![Homepage screenshot placeholder](https://via.placeholder.com/1200x700?text=Homepage+Screenshot)
-![Posts listing screenshot placeholder](https://via.placeholder.com/1200x700?text=Posts+Listing+Screenshot)
-![Admin dashboard screenshot placeholder](https://via.placeholder.com/1200x700?text=Admin+Dashboard+Screenshot)
 
 ## Features
 
-- Anonymous post publishing with private editor tokens stored in `localStorage`
+- Anonymous post publishing with private editor-token cookies stored as `HttpOnly`
 - Prisma ORM data layer with schema-based relationships, seeding, and cleaner model access
 - Token-protected edit and delete routes for post owners
 - Sanitized user input with a safe HTML whitelist to reduce XSS risk
@@ -95,7 +87,7 @@ DB_NAME=malawi_hidden_gems
 DATABASE_URL=mysql://your_mysql_user:your_mysql_password@127.0.0.1:3306/malawi_hidden_gems
 MAX_UPLOAD_SIZE_BYTES=5242880
 SESSION_SECRET=replace_with_a_long_random_secret
-ADMIN_PASSWORD=replace_with_a_secure_password
+ADMIN_PASSWORD_HASH=your_bcrypt_hash_here
 CLOUDINARY_CLOUD_NAME=your_cloud_name
 CLOUDINARY_API_KEY=your_api_key
 CLOUDINARY_API_SECRET=your_api_secret

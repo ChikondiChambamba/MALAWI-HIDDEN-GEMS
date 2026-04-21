@@ -2,11 +2,10 @@
 
 <article class="grid gap-8 lg:grid-cols-[1.1fr_0.55fr]">
   <div class="surface-panel overflow-hidden">
-    <% if (issuedEditorToken) { %>
-      <div class="border-b border-emerald-100 bg-emerald-50/80 px-6 py-5 text-sm text-emerald-800 md:px-8" data-issued-editor-token="<%= issuedEditorToken %>" data-issued-post-id="<%= post.id %>">
-        <strong class="block font-semibold">Your editor token has been saved in this browser.</strong>
-        <p class="mt-2 leading-7">Keep a copy if you want a backup for editing or deleting this story later.</p>
-        <code class="mt-3 block overflow-x-auto rounded-2xl bg-white px-4 py-3 text-xs text-ink-800"><%= issuedEditorToken %></code>
+    <% if (editorAccessGranted) { %>
+      <div class="border-b border-emerald-100 bg-emerald-50/80 px-6 py-5 text-sm text-emerald-800 md:px-8">
+        <strong class="block font-semibold">Editing access was saved securely in this browser.</strong>
+        <p class="mt-2 leading-7">You can return later from this device to edit or delete this story without exposing the editor token to client-side scripts.</p>
       </div>
     <% } %>
 
@@ -86,13 +85,14 @@
     <section class="surface-panel p-6">
       <div class="flex flex-col gap-3">
         <a href="/posts" class="inline-flex items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Back to all experiences</a>
-        <div class="editor-controls hidden flex-col gap-3" data-post-id="<%= post.id %>">
+        <% if (post.canEdit) { %>
+        <div class="editor-controls flex-col gap-3" data-post-id="<%= post.id %>">
           <a href="/posts/<%= post.id %>/edit" class="editor-edit-link inline-flex items-center justify-center rounded-full bg-forest-600 px-5 py-3 text-sm font-semibold text-white hover:bg-forest-700">Edit this experience</a>
           <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form editor-delete-form" data-post-id="<%= post.id %>">
-            <input type="hidden" name="editorToken" class="editor-token-field">
             <button type="submit" class="w-full rounded-full border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100">Delete experience</button>
           </form>
         </div>
+        <% } %>
       </div>
     </section>
   </aside>

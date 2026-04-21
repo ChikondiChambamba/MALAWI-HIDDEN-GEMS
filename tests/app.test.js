@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+
 process.env.NODE_ENV = 'test';
 process.env.PORT = '3001';
 process.env.DB_HOST = 'localhost';
@@ -6,7 +8,7 @@ process.env.DB_USER = 'test-user';
 process.env.DB_PASSWORD = 'test-password';
 process.env.DB_NAME = 'test-db';
 process.env.SESSION_SECRET = 'test-session-secret';
-process.env.ADMIN_PASSWORD = 'secret-admin-password';
+process.env.ADMIN_PASSWORD_HASH = bcrypt.hashSync('secret-admin-password', 12);
 
 const request = require('supertest');
 
@@ -64,7 +66,7 @@ beforeEach(() => {
 });
 
 describe('Malawi Hidden Gems routes', () => {
-  test('POST /posts creates a post and returns a token', async () => {
+  test('POST /posts creates a post and sets an editor cookie', async () => {
     Post.createPost.mockResolvedValue({
       id: 42,
       editorToken: 'editor-token-42',
@@ -85,9 +87,11 @@ describe('Malawi Hidden Gems routes', () => {
     expect(response.status).toBe(201);
     expect(response.body).toEqual({
       id: 42,
-      editorToken: 'editor-token-42',
       redirectTo: '/posts/42',
     });
+    expect(response.headers['set-cookie']).toEqual(expect.arrayContaining([
+      expect.stringContaining('mhg_editor_42=editor-token-42'),
+    ]));
     expect(Post.createPost).toHaveBeenCalledWith(expect.objectContaining({
       title: 'Cape Maclear',
       authorName: 'Alice',
@@ -160,8 +164,8 @@ describe('Malawi Hidden Gems routes', () => {
     const successResponse = await request(app)
       .put('/posts/1')
       .set('Accept', 'application/json')
+      .set('Cookie', 'mhg_editor_1=correct-token')
       .send({
-        editorToken: 'correct-token',
         title: 'Updated title',
         authorName: 'Traveler',
         location: 'Lake Malawi',
@@ -194,11 +198,10 @@ describe('Malawi Hidden Gems routes', () => {
     const successResponse = await request(app)
       .delete('/posts/1')
       .set('Accept', 'application/json')
-      .send({
-        editorToken: 'correct-token',
-      });
+      .set('Cookie', 'mhg_editor_1=correct-token');
 
     expect(successResponse.status).toBe(200);
+    expect(Post.validateEditorToken).toHaveBeenCalledWith('1', 'correct-token');
     expect(Post.deletePost).toHaveBeenCalledWith('1');
     expect(successResponse.body).toEqual({
       id: 1,

@@ -11,6 +11,7 @@ const adapter = globalForPrisma.prismaAdapter || new PrismaMariaDb({
   password: env.dbPassword,
   database: env.dbName,
   connectionLimit: 10,
+  allowPublicKeyRetrieval: true,
 });
 
 const prisma = globalForPrisma.prisma || new PrismaClient({

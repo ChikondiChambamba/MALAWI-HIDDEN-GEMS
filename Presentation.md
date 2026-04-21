@@ -19,7 +19,7 @@
 
 - **Key Features**:
   - Blog CRUD: Create, Read, Update, Delete posts.
-- **Tools**: Express.js, mysql2 (Node.js driver), Multer (for file uploads in blogs).
+- **Tools**: Express.js, Prisma ORM with the MariaDB adapter, and Multer (for file uploads in blogs).
 
 
 ## Slide 4: Section 2 - Creating the MySQL Database
@@ -52,24 +52,26 @@
 
 ## Slide 5: Section 3 - Connecting MySQL to Express.js
 - **Step 1: Set Up Your Express App**
-  - Install dependencies: `npm init -y; npm install express mysql2 dotenv multer method-override ejs`
+  - Install dependencies: `npm init -y; npm install express prisma @prisma/client @prisma/adapter-mariadb mariadb dotenv multer method-override ejs`
   - Basic app structure: Folders for views (EJS templates), public (static files), routes.
 
 - **Step 2: Configure Database Connection**
-  - Use a connection pool for efficiency (handles multiple queries).
+  - Use Prisma with the MariaDB adapter for a scalable, maintainable data layer.
   - Code Snippet (in app.js):
     ```javascript
     require('dotenv').config();  // For environment variables
-    const mysql = require('mysql2/promise');
-    const pool = mysql.createPool({
+    const { PrismaClient } = require('@prisma/client');
+    const { PrismaMariaDb } = require('@prisma/adapter-mariadb');
+
+    const adapter = new PrismaMariaDb({
       host: process.env.DB_HOST || 'localhost',
+      port: Number(process.env.DB_PORT || 3306),
       user: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME || 'blog_app',
-      waitForConnections: true,
-      connectionLimit: 10,
-      queueLimit: 0
     });
+
+    const prisma = new PrismaClient({ adapter });
     ```
   - Store credentials in a `.env` file (e.g., `DB_PASSWORD=yourpassword`) for security.
 
@@ -77,16 +79,16 @@
 ## Slide 6: Section 4 - Integrating Database Operations for Blog Posts (CRUD)
 
 - **Create (POST /posts)**: Handle form submission, upload image, insert into DB.
-  - Code: Use `pool.query('INSERT INTO posts ...')` in an async route.
+  - Code: Use `prisma.post.create({ data: ... })` in an async route.
 
 - **Read (GET /, GET /posts/:id)**: Fetch all or single post.
-  - Code: `const [rows] = await pool.query('SELECT * FROM posts ORDER BY createdAt DESC');`
+  - Code: `const posts = await prisma.post.findMany({ orderBy: { createdAt: 'desc' } });`
 
 - **Update (PUT /posts/:id)**: Edit form, update DB.
-  - Code: `await pool.query('UPDATE posts SET ... WHERE id = ?', [values]);`
+  - Code: `await prisma.post.update({ where: { id }, data: ... });`
 
 - **Delete (DELETE /posts/:id)**: Remove from DB.
-  - Code: `await pool.query('DELETE FROM posts WHERE id = ?', [id]);`
+  - Code: `await prisma.post.delete({ where: { id } });`
 
 
 ## Thank You!

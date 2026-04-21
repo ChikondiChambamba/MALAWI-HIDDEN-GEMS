@@ -1,29 +1,4 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const editorTokenStorageKey = 'malawi-hidden-gems:editor-tokens';
-  const leafletAssets = {
-    css: '/vendor/leaflet/leaflet.css',
-    js: '/vendor/leaflet/leaflet.js',
-  };
-
-  function getStoredEditorTokens() {
-    try {
-      const rawValue = localStorage.getItem(editorTokenStorageKey);
-      const parsedValue = rawValue ? JSON.parse(rawValue) : {};
-      return parsedValue && typeof parsedValue === 'object' ? parsedValue : {};
-    } catch (error) {
-      return {};
-    }
-  }
-
-  function setStoredEditorToken(postId, token) {
-    const nextTokens = {
-      ...getStoredEditorTokens(),
-      [String(postId)]: token,
-    };
-
-    localStorage.setItem(editorTokenStorageKey, JSON.stringify(nextTokens));
-  }
-
   function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) {
       return;
@@ -32,50 +7,6 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/service-worker.js').catch(() => {});
     });
-  }
-
-  function wireEditorTokens() {
-    const issuedEditorTokenNotice = document.querySelector('[data-issued-editor-token][data-issued-post-id]');
-    if (issuedEditorTokenNotice) {
-      setStoredEditorToken(
-        issuedEditorTokenNotice.getAttribute('data-issued-post-id'),
-        issuedEditorTokenNotice.getAttribute('data-issued-editor-token')
-      );
-    }
-
-    const storedEditorTokens = getStoredEditorTokens();
-    document.querySelectorAll('.editor-controls').forEach((controlGroup) => {
-      const postId = controlGroup.getAttribute('data-post-id');
-      const editorToken = storedEditorTokens[postId];
-
-      if (!editorToken) {
-        return;
-      }
-
-      controlGroup.classList.remove('hidden');
-
-      const editLink = controlGroup.querySelector('.editor-edit-link');
-      if (editLink) {
-        const editUrl = new URL(editLink.getAttribute('href'), window.location.origin);
-        editUrl.searchParams.set('editorToken', editorToken);
-        editLink.setAttribute('href', `${editUrl.pathname}${editUrl.search}`);
-      }
-
-      controlGroup.querySelectorAll('.editor-token-field').forEach((field) => {
-        field.value = editorToken;
-      });
-    });
-
-    const standaloneEditorTokenField = document.getElementById('editorTokenField');
-    if (standaloneEditorTokenField && !standaloneEditorTokenField.value) {
-      const pathParts = window.location.pathname.split('/');
-      const postId = pathParts.length >= 3 ? pathParts[2] : '';
-      const editorToken = storedEditorTokens[postId];
-
-      if (editorToken) {
-        standaloneEditorTokenField.value = editorToken;
-      }
-    }
   }
 
   function wireDeleteConfirmation() {
@@ -130,28 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
       return Promise.resolve(window.L);
     }
 
-    return new Promise((resolve, reject) => {
-      if (!document.querySelector(`link[href="${leafletAssets.css}"]`)) {
-        const stylesheet = document.createElement('link');
-        stylesheet.rel = 'stylesheet';
-        stylesheet.href = leafletAssets.css;
-        document.head.appendChild(stylesheet);
-      }
-
-      const existingScript = document.querySelector(`script[src="${leafletAssets.js}"]`);
-      if (existingScript) {
-        existingScript.addEventListener('load', () => resolve(window.L), { once: true });
-        existingScript.addEventListener('error', reject, { once: true });
-        return;
-      }
-
-      const script = document.createElement('script');
-      script.src = leafletAssets.js;
-      script.defer = true;
-      script.onload = () => resolve(window.L);
-      script.onerror = reject;
-      document.body.appendChild(script);
-    });
+    return Promise.reject(new Error('Leaflet is not available on the page.'));
   }
 
   function buildTileLayer(L) {
@@ -298,7 +208,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   registerServiceWorker();
-  wireEditorTokens();
   wireDeleteConfirmation();
   wireTextareas();
   wireImagePreview();

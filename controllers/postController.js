@@ -10,6 +10,11 @@ const {
 const { sanitizePlainText } = require('../utils/text');
 const { uploadImageIfProvided, removeImageIfManagedUpload } = require('../utils/fileManager');
 const {
+  hasEditorTokenCookie,
+  setEditorTokenCookie,
+  clearEditorTokenCookie,
+} = require('../utils/editorTokenCookie');
+const {
   buildSeoMeta,
   buildWebsiteStructuredData,
   buildPostStructuredData,
@@ -37,6 +42,13 @@ function buildPostDetail(post) {
     imageUrl: resolveImageUrl(post.imagePath),
     formattedContent: formatPostContent(post.content),
     readTime: calculateReadTime(post.content),
+  };
+}
+
+function addEditorAccess(post, req) {
+  return {
+    ...post,
+    canEdit: hasEditorTokenCookie(req, post.id),
   };
 }
 
@@ -100,8 +112,8 @@ async function renderListingPage(req, res, options = {}) {
     }),
     structuredData: [buildWebsiteStructuredData()],
     isHomePage,
-    featuredPost: featuredPost ? buildPostCard(featuredPost) : null,
-    posts: listing.posts.map(buildPostCard),
+    featuredPost: featuredPost ? addEditorAccess(buildPostCard(featuredPost), req) : null,
+    posts: listing.posts.map((post) => addEditorAccess(buildPostCard(post), req)),
     tags,
     activeTag,
     searchQuery: filters.searchQuery,
@@ -120,6 +132,7 @@ async function renderListingPage(req, res, options = {}) {
       ? 'No gems found. Try a different keyword or explore another tag.'
       : 'No posts yet. Be the first to share your Malawi experience.',
     mapEndpoint: '/api/destinations',
+    needsLeaflet: true,
     buildTagUrl(tagSlug) {
       return `/posts${buildListQueryString({ page: 1, searchQuery: filters.searchQuery, tagSlug })}`;
     },
@@ -162,17 +175,14 @@ async function showPost(req, res) {
     throw error;
   }
 
-  const pendingEditorToken = req.session?.pendingEditorToken;
-  const issuedEditorToken = pendingEditorToken
-    && Number(pendingEditorToken.postId) === Number(post.id)
-    ? pendingEditorToken.token
-    : '';
+  const pendingEditorPostId = req.session?.pendingEditorPostId;
+  const editorAccessGranted = pendingEditorPostId && Number(pendingEditorPostId) === Number(post.id);
 
-  if (issuedEditorToken && req.session) {
-    delete req.session.pendingEditorToken;
+  if (editorAccessGranted && req.session) {
+    delete req.session.pendingEditorPostId;
   }
 
-  const detailedPost = buildPostDetail(post);
+  const detailedPost = addEditorAccess(buildPostDetail(post), req);
   const excerpt = buildExcerpt(post.content, 155);
 
   res.render('post', {
@@ -191,7 +201,8 @@ async function showPost(req, res) {
       excerpt,
     })],
     post: detailedPost,
-    issuedEditorToken,
+    editorAccessGranted,
+    needsLeaflet: true,
   });
 }
 
@@ -235,18 +246,17 @@ async function createPost(req, res) {
     });
 
     if (requestExpectsJson(req)) {
+      setEditorTokenCookie(req, res, newPost.id, newPost.editorToken);
       return res.status(201).json({
         id: newPost.id,
-        editorToken: newPost.editorToken,
         redirectTo: `/posts/${newPost.id}`,
       });
     }
 
+    setEditorTokenCookie(req, res, newPost.id, newPost.editorToken);
+
     if (req.session) {
-      req.session.pendingEditorToken = {
-        postId: newPost.id,
-        token: newPost.editorToken,
-      };
+      req.session.pendingEditorPostId = newPost.id;
     }
 
     return res.redirect(`/posts/${newPost.id}`);
@@ -281,9 +291,8 @@ async function renderEditForm(req, res) {
       noIndex: true,
     }),
     form: buildPostFormData(post, null, post),
-    post: buildPostDetail(post),
+    post: addEditorAccess(buildPostDetail(post), req),
     tags,
-    editorToken: req.editorToken || req.query.editorToken || '',
   });
 }
 
@@ -313,12 +322,11 @@ async function updatePost(req, res) {
       }),
       error: validation.message,
       form,
-      post: buildPostDetail({
+      post: addEditorAccess(buildPostDetail({
         ...existingPost,
         ...form,
-      }),
+      }), req),
       tags,
-      editorToken: req.editorToken || req.body.editorToken || '',
     });
   }
 
@@ -370,6 +378,7 @@ async function deletePost(req, res) {
   }
 
   await Post.deletePost(req.params.id);
+  clearEditorTokenCookie(req, res, req.params.id);
 
   if (existingPost.imagePublicId) {
     await removeImageIfManagedUpload(existingPost.imagePublicId);

@@ -1,3 +1,4 @@
+const bcrypt = require('bcryptjs');
 const env = require('../config/env');
 const Post = require('../models/postModel');
 const {
@@ -7,6 +8,7 @@ const {
 } = require('../utils/postFormatter');
 const { removeImageIfManagedUpload } = require('../utils/fileManager');
 const { buildSeoMeta } = require('../utils/seo');
+const { clearEditorTokenCookie } = require('../utils/editorTokenCookie');
 
 function renderLogin(req, res) {
   if (req.session && req.session.isAdmin) {
@@ -26,10 +28,11 @@ function renderLogin(req, res) {
   });
 }
 
-function login(req, res) {
+async function login(req, res) {
   const password = typeof req.body.password === 'string' ? req.body.password : '';
+  const passwordMatches = await bcrypt.compare(password, env.adminPasswordHash);
 
-  if (password !== env.adminPassword) {
+  if (!passwordMatches) {
     return res.status(401).render('admin-login', {
       title: 'Admin Login | Malawi Hidden Gems',
       pageDescription: 'Administrator login for Malawi Hidden Gems.',
@@ -84,6 +87,7 @@ async function deletePost(req, res) {
   }
 
   await Post.deletePost(req.params.id);
+  clearEditorTokenCookie(req, res, req.params.id);
 
   if (post.imagePublicId) {
     await removeImageIfManagedUpload(post.imagePublicId);

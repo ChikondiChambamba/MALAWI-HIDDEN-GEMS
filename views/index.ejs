@@ -3,7 +3,7 @@
 <section class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]">
   <div class="surface-panel overflow-hidden p-8 md:p-12">
     <p class="eyebrow">Discover beautifully</p>
-    <h1 class="mt-4 max-w-3xl font-display text-5xl leading-none text-ink-900 md:text-7xl">Premium Malawi travel discovery for slow networks and curious explorers.</h1>
+    <h1 class="mt-4 max-w-3xl font-display text-5xl leading-none text-ink-900 md:text-7xl">Premium Malawi travel discovery for curious explorers.</h1>
     <p class="mt-6 max-w-2xl text-base leading-8 text-ink-700 md:text-lg">
       Browse thoughtful stories, find destinations by region and theme, preview places on a lightweight map, and revisit previously opened pages even when the internet drops.
     </p>
@@ -149,13 +149,14 @@
             <p class="mt-5 text-sm leading-7 text-ink-700"><%= post.excerpt %></p>
             <div class="mt-6 flex flex-wrap gap-3">
               <a href="/posts/<%= post.id %>" class="inline-flex items-center rounded-full bg-forest-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-forest-700">Read story</a>
-              <div class="editor-controls hidden flex-wrap gap-3" data-post-id="<%= post.id %>">
+              <% if (post.canEdit) { %>
+              <div class="editor-controls flex-wrap gap-3" data-post-id="<%= post.id %>">
                 <a href="/posts/<%= post.id %>/edit" class="editor-edit-link inline-flex items-center rounded-full border border-black/10 px-4 py-2.5 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Edit</a>
                 <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form editor-delete-form" data-post-id="<%= post.id %>">
-                  <input type="hidden" name="editorToken" class="editor-token-field">
                   <button type="submit" class="inline-flex items-center rounded-full border border-red-200 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-700 hover:bg-red-100">Delete</button>
                 </form>
               </div>
+              <% } %>
             </div>
           </div>
         </article>
