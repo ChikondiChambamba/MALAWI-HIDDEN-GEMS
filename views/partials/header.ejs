@@ -3,23 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %></title>
-  <meta name="description" content="<%= pageDescription || siteName %>">
-  <link rel="stylesheet" href="/css/style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <title><%= (seo && seo.title) || title || siteName %></title>
+  <meta name="description" content="<%= (seo && seo.description) || pageDescription || siteName %>">
+  <meta name="theme-color" content="#305542">
+  <meta property="og:site_name" content="<%= (seo && seo.siteName) || siteName %>">
+  <meta property="og:title" content="<%= (seo && seo.title) || title || siteName %>">
+  <meta property="og:description" content="<%= (seo && seo.description) || pageDescription || siteName %>">
+  <meta property="og:type" content="<%= (seo && seo.type) || 'website' %>">
+  <meta property="og:url" content="<%= (seo && seo.canonicalUrl) || currentUrl %>">
+  <meta property="og:image" content="<%= (seo && seo.imageUrl) || (siteUrl + '/images/logo.png') %>">
+  <meta property="og:image:alt" content="<%= (seo && seo.imageAlt) || siteName %>">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="<%= (seo && seo.title) || title || siteName %>">
+  <meta name="twitter:description" content="<%= (seo && seo.description) || pageDescription || siteName %>">
+  <meta name="twitter:image" content="<%= (seo && seo.imageUrl) || (siteUrl + '/images/logo.png') %>">
+  <link rel="canonical" href="<%= (seo && seo.canonicalUrl) || currentUrl %>">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <link rel="apple-touch-icon" href="/images/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/tailwind.css">
+  <% if (seo && seo.noIndex) { %>
+    <meta name="robots" content="noindex,nofollow">
+  <% } %>
+  <% if (Array.isArray(structuredData)) { %>
+    <% structuredData.forEach((item) => { %>
+      <script type="application/ld+json"><%- JSON.stringify(item).replace(/</g, '\\u003c') %></script>
+    <% }) %>
+  <% } %>
 </head>
-<body>
-  <header>
-    <div class="container header-content">
-      <div class="logo-container">
-        <img src="/images/logo.png" alt="Malawi Tourism Logo" class="logo-image">
-        <div class="logo-text">
-          <h1>Malawi Hidden Gems</h1>
-          <p>Discover the Warm Heart of Africa</p>
+<body class="min-h-screen page-fade">
+  <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-[100] focus:rounded-full focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-forest-700">
+    Skip to content
+  </a>
+  <header class="flag-header">
+    <div class="relative z-10 mx-auto max-w-7xl px-6 py-5 lg:px-8">
+      <div class="flex flex-col gap-6">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <a href="/" class="group inline-flex items-center gap-4">
+            <span class="inline-flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/15 p-2 shadow-lg shadow-black/10 backdrop-blur-md">
+              <img src="/images/logo.png" alt="Malawi Hidden Gems logo" class="h-full w-full rounded-xl object-cover">
+            </span>
+            <span>
+              <span class="block font-display text-4xl leading-none tracking-tight text-white md:text-5xl">Malawi Hidden Gems</span>
+              <span class="mt-1 block text-sm font-medium tracking-[0.2em] text-white/75 uppercase">Premium Malawi discovery, built for every connection</span>
+            </span>
+          </a>
+          <div class="glass-panel flex flex-col gap-2 px-5 py-4 text-sm text-white/80 lg:max-w-sm">
+            <span class="eyebrow !text-white/70">Always Ready</span>
+            <p class="text-sm leading-6">Offline-friendly tourism inspiration with fast media delivery, elegant mapping, and low-bandwidth resilience for travelers across Malawi.</p>
+          </div>
         </div>
+        <%- include('navigation') %>
       </div>
     </div>
-    <%- include('navigation') %>
   </header>
 
-  <main class="container">
+  <main id="main-content" class="mx-auto max-w-7xl px-6 pb-16 pt-8 lg:px-8">

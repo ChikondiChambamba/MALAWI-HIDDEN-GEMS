@@ -11,6 +11,7 @@ const writeLimiter = rateLimit({ windowMs: 15 * 60 * 1000, maxRequests: 30 });
 
 router.get('/posts', asyncHandler(postController.listPosts));
 router.get('/posts/search', asyncHandler(postController.searchPosts));
+router.get('/api/destinations', asyncHandler(postController.listDestinationsApi));
 router.get('/create', asyncHandler(postController.renderPostForm));
 router.get('/posts/new', asyncHandler(postController.renderPostForm));
 router.get('/posts/:id', asyncHandler(postController.showPost));

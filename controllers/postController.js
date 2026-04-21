@@ -9,6 +9,11 @@ const {
 } = require('../utils/postFormatter');
 const { sanitizePlainText } = require('../utils/text');
 const { uploadImageIfProvided, removeImageIfManagedUpload } = require('../utils/fileManager');
+const {
+  buildSeoMeta,
+  buildWebsiteStructuredData,
+  buildPostStructuredData,
+} = require('../utils/seo');
 
 const POSTS_PER_PAGE = 10;
 
@@ -86,6 +91,14 @@ async function renderListingPage(req, res, options = {}) {
   res.render('index', {
     title: isHomePage ? 'Malawi Hidden Gems' : 'Explore Hidden Gems | Malawi Hidden Gems',
     pageDescription: 'Discover Malawi travel stories, destination tips, and local hidden gems from fellow explorers.',
+    seo: buildSeoMeta({
+      title: isHomePage ? 'Malawi Hidden Gems | Discover Malawi Beautifully' : 'Explore Malawi Hidden Gems',
+      description: 'Browse Malawi destinations, travel stories, curated local gems, and offline-friendly inspiration built for mobile-first discovery.',
+      pathname: req.originalUrl,
+      image: featuredPost ? resolveImageUrl(featuredPost.imagePath) : '/images/hero-bg.jpg',
+      imageAlt: featuredPost ? featuredPost.title : 'Malawi Hidden Gems homepage',
+    }),
+    structuredData: [buildWebsiteStructuredData()],
     isHomePage,
     featuredPost: featuredPost ? buildPostCard(featuredPost) : null,
     posts: listing.posts.map(buildPostCard),
@@ -106,6 +119,7 @@ async function renderListingPage(req, res, options = {}) {
     noResultsMessage: filters.searchQuery || activeTag
       ? 'No gems found. Try a different keyword or explore another tag.'
       : 'No posts yet. Be the first to share your Malawi experience.',
+    mapEndpoint: '/api/destinations',
     buildTagUrl(tagSlug) {
       return `/posts${buildListQueryString({ page: 1, searchQuery: filters.searchQuery, tagSlug })}`;
     },
@@ -119,6 +133,13 @@ async function renderPostForm(req, res) {
   res.render('create', {
     title: 'Share a Hidden Gem | Malawi Hidden Gems',
     pageDescription: 'Create a new Malawi Hidden Gems travel story.',
+    seo: buildSeoMeta({
+      title: 'Share a Hidden Gem | Malawi Hidden Gems',
+      description: 'Publish a new destination story for Malawi Hidden Gems.',
+      pathname: req.originalUrl,
+      image: '/images/logo.png',
+      noIndex: true,
+    }),
     form: buildPostFormData(),
     tags,
   });
@@ -151,10 +172,25 @@ async function showPost(req, res) {
     delete req.session.pendingEditorToken;
   }
 
+  const detailedPost = buildPostDetail(post);
+  const excerpt = buildExcerpt(post.content, 155);
+
   res.render('post', {
     title: `${post.title} | Malawi Hidden Gems`,
-    pageDescription: buildExcerpt(post.content, 155),
-    post: buildPostDetail(post),
+    pageDescription: excerpt,
+    seo: buildSeoMeta({
+      title: `${post.title} | Malawi Hidden Gems`,
+      description: excerpt,
+      pathname: req.originalUrl,
+      image: resolveImageUrl(post.imagePath),
+      imageAlt: post.title,
+      type: 'article',
+    }),
+    structuredData: [buildPostStructuredData({
+      ...detailedPost,
+      excerpt,
+    })],
+    post: detailedPost,
     issuedEditorToken,
   });
 }
@@ -168,6 +204,13 @@ async function createPost(req, res) {
     return res.status(400).render('create', {
       title: 'Share a Hidden Gem | Malawi Hidden Gems',
       pageDescription: 'Create a new Malawi Hidden Gems travel story.',
+      seo: buildSeoMeta({
+        title: 'Share a Hidden Gem | Malawi Hidden Gems',
+        description: 'Publish a new destination story for Malawi Hidden Gems.',
+        pathname: req.originalUrl,
+        image: '/images/logo.png',
+        noIndex: true,
+      }),
       error: validation.message,
       form,
       tags,
@@ -183,6 +226,8 @@ async function createPost(req, res) {
       title: form.title,
       authorName: form.authorName,
       location: form.location,
+      latitude: form.latitude,
+      longitude: form.longitude,
       content: form.content,
       imagePath: uploadedImage ? uploadedImage.url : 'default.jpg',
       imagePublicId: uploadedImage ? uploadedImage.publicId : null,
@@ -228,6 +273,13 @@ async function renderEditForm(req, res) {
   res.render('edit', {
     title: `Edit ${post.title} | Malawi Hidden Gems`,
     pageDescription: `Update the travel story "${post.title}" on Malawi Hidden Gems.`,
+    seo: buildSeoMeta({
+      title: `Edit ${post.title} | Malawi Hidden Gems`,
+      description: `Update the story "${post.title}" on Malawi Hidden Gems.`,
+      pathname: req.originalUrl,
+      image: resolveImageUrl(post.imagePath),
+      noIndex: true,
+    }),
     form: buildPostFormData(post, null, post),
     post: buildPostDetail(post),
     tags,
@@ -252,6 +304,13 @@ async function updatePost(req, res) {
     return res.status(400).render('edit', {
       title: `Edit ${existingPost.title} | Malawi Hidden Gems`,
       pageDescription: `Update the travel story "${existingPost.title}" on Malawi Hidden Gems.`,
+      seo: buildSeoMeta({
+        title: `Edit ${existingPost.title} | Malawi Hidden Gems`,
+        description: `Update the story "${existingPost.title}" on Malawi Hidden Gems.`,
+        pathname: req.originalUrl,
+        image: resolveImageUrl(existingPost.imagePath),
+        noIndex: true,
+      }),
       error: validation.message,
       form,
       post: buildPostDetail({
@@ -272,6 +331,8 @@ async function updatePost(req, res) {
       title: form.title,
       authorName: form.authorName,
       location: form.location,
+      latitude: form.latitude,
+      longitude: form.longitude,
       content: form.content,
       imagePath: uploadedImage ? uploadedImage.url : existingPost.imagePath,
       imagePublicId: uploadedImage ? uploadedImage.publicId : existingPost.imagePublicId,
@@ -324,6 +385,18 @@ async function deletePost(req, res) {
   return res.redirect('/posts');
 }
 
+async function listDestinationsApi(req, res) {
+  const destinations = await Post.getMapDestinations();
+
+  res.json({
+    destinations: destinations.map((destination) => ({
+      ...destination,
+      imageUrl: resolveImageUrl(destination.imagePath),
+      url: `/posts/${destination.id}`,
+    })),
+  });
+}
+
 module.exports = {
   renderListingPage,
   renderPostForm,
@@ -334,4 +407,5 @@ module.exports = {
   renderEditForm,
   updatePost,
   deletePost,
+  listDestinationsApi,
 };

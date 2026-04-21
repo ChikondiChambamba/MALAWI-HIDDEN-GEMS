@@ -1,33 +1,47 @@
 const crypto = require('crypto');
 
-const { pool, query } = require('../config/database');
+const { prisma } = require('../config/prisma');
 
-function mapTag(row) {
+const POSTS_INCLUDE = {
+  postTags: {
+    include: {
+      tag: true,
+    },
+  },
+};
+
+function mapTag(tag) {
   return {
-    id: row.id,
-    name: row.name,
-    slug: row.slug,
+    id: tag.id,
+    name: tag.name,
+    slug: tag.slug,
   };
 }
 
-function mapPost(row) {
-  if (!row) {
+function mapPost(post) {
+  if (!post) {
     return null;
   }
 
+  const tags = (post.postTags || [])
+    .map((postTag) => mapTag(postTag.tag))
+    .sort((left, right) => left.name.localeCompare(right.name));
+
   return {
-    id: row.id,
-    title: row.title,
-    authorName: row.author_name,
-    location: row.location,
-    imagePath: row.image_path,
-    imagePublicId: row.image_public_id,
-    content: row.content,
-    featured: Boolean(row.featured),
-    featuredUntil: row.featured_until,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-    tags: [],
+    id: post.id,
+    title: post.title,
+    authorName: post.authorName,
+    location: post.location,
+    latitude: post.latitude,
+    longitude: post.longitude,
+    imagePath: post.imagePath,
+    imagePublicId: post.imagePublicId,
+    content: post.content,
+    featured: post.featured,
+    featuredUntil: post.featuredUntil,
+    createdAt: post.createdAt,
+    updatedAt: post.updatedAt,
+    tags,
   };
 }
 
@@ -38,178 +52,139 @@ function normalizePagination(page = 1, pageSize = 10) {
   return {
     page: safePage,
     pageSize: safePageSize,
-    offset: (safePage - 1) * safePageSize,
+    skip: (safePage - 1) * safePageSize,
   };
 }
 
-function buildPaginationClause(page, pageSize) {
-  const { offset, pageSize: normalizedPageSize } = normalizePagination(page, pageSize);
-
-  return {
-    limitSql: `LIMIT ${normalizedPageSize} OFFSET ${offset}`,
-    pageSize: normalizedPageSize,
-    offset,
-  };
-}
-
-function buildPostFilterWhereClause(filters = {}) {
+function buildWhereClause(filters = {}) {
   const conditions = [];
-  const params = [];
 
   if (filters.searchQuery) {
-    conditions.push('(posts.title LIKE ? OR posts.content LIKE ?)');
-    params.push(`%${filters.searchQuery}%`, `%${filters.searchQuery}%`);
+    conditions.push({
+      OR: [
+        {
+          title: {
+            contains: filters.searchQuery,
+          },
+        },
+        {
+          content: {
+            contains: filters.searchQuery,
+          },
+        },
+        {
+          location: {
+            contains: filters.searchQuery,
+          },
+        },
+      ],
+    });
   }
 
   if (filters.tagSlug) {
-    conditions.push(`
-      EXISTS (
-        SELECT 1
-        FROM post_tags AS postTagFilter
-        INNER JOIN tags AS tagFilter
-          ON tagFilter.id = postTagFilter.tag_id
-        WHERE postTagFilter.post_id = posts.id
-          AND tagFilter.slug = ?
-      )
-    `);
-    params.push(filters.tagSlug);
+    conditions.push({
+      postTags: {
+        some: {
+          tag: {
+            slug: filters.tagSlug,
+          },
+        },
+      },
+    });
   }
 
   if (filters.onlyFeatured) {
-    conditions.push('posts.featured = TRUE');
-    conditions.push('(posts.featured_until IS NULL OR posts.featured_until >= NOW())');
+    conditions.push({
+      featured: true,
+    });
+    conditions.push({
+      OR: [
+        {
+          featuredUntil: null,
+        },
+        {
+          featuredUntil: {
+            gte: new Date(),
+          },
+        },
+      ],
+    });
+  }
+
+  if (!conditions.length) {
+    return {};
+  }
+
+  if (conditions.length === 1) {
+    return conditions[0];
   }
 
   return {
-    whereSql: conditions.length ? `WHERE ${conditions.join(' AND ')}` : '',
-    params,
+    AND: conditions,
   };
 }
 
-async function attachTags(posts) {
-  if (!posts.length) {
-    return posts;
-  }
-
-  const postIds = posts.map((post) => post.id);
-  const placeholders = postIds.map(() => '?').join(', ');
-  const tagRows = await query(`
-    SELECT post_tags.post_id, tags.id, tags.name, tags.slug
-    FROM post_tags
-    INNER JOIN tags
-      ON tags.id = post_tags.tag_id
-    WHERE post_tags.post_id IN (${placeholders})
-    ORDER BY tags.name ASC
-  `, postIds);
-
-  const tagsByPostId = new Map();
-
-  tagRows.forEach((row) => {
-    const existingTags = tagsByPostId.get(row.post_id) || [];
-    existingTags.push(mapTag(row));
-    tagsByPostId.set(row.post_id, existingTags);
-  });
-
-  return posts.map((post) => ({
-    ...post,
-    tags: tagsByPostId.get(post.id) || [],
-  }));
-}
-
-async function getTagIdsBySlugs(connection, tagSlugs = []) {
+async function getTagsBySlugs(tagSlugs = []) {
   if (!tagSlugs.length) {
     return [];
   }
 
-  const placeholders = tagSlugs.map(() => '?').join(', ');
-  const [rows] = await connection.execute(`
-    SELECT id
-    FROM tags
-    WHERE slug IN (${placeholders})
-  `, tagSlugs);
-
-  return rows.map((row) => row.id);
+  return prisma.tag.findMany({
+    where: {
+      slug: {
+        in: tagSlugs,
+      },
+    },
+    orderBy: {
+      name: 'asc',
+    },
+  });
 }
 
-async function replacePostTags(connection, postId, tagSlugs = []) {
-  await connection.execute('DELETE FROM post_tags WHERE post_id = ?', [postId]);
-
-  if (!tagSlugs.length) {
-    return;
-  }
-
-  const tagIds = await getTagIdsBySlugs(connection, tagSlugs);
-
-  if (!tagIds.length) {
-    return;
-  }
-
-  const valuePlaceholders = tagIds.map(() => '(?, ?)').join(', ');
-  const params = tagIds.flatMap((tagId) => [postId, tagId]);
-
-  await connection.execute(`
-    INSERT INTO post_tags (post_id, tag_id)
-    VALUES ${valuePlaceholders}
-  `, params);
+function buildTagWrites(tags) {
+  return tags.map((tag) => ({
+    tag: {
+      connect: {
+        id: tag.id,
+      },
+    },
+  }));
 }
 
 async function getPostById(id) {
-  const rows = await query(`
-    SELECT
-      posts.id,
-      posts.title,
-      posts.author_name,
-      posts.location,
-      posts.image_path,
-      posts.image_public_id,
-      posts.content,
-      posts.featured,
-      posts.featured_until,
-      posts.created_at,
-      posts.updated_at
-    FROM posts
-    WHERE posts.id = ?
-    LIMIT 1
-  `, [id]);
+  const post = await prisma.post.findUnique({
+    where: {
+      id: Number(id),
+    },
+    include: POSTS_INCLUDE,
+  });
 
-  const [post] = await attachTags(rows.map(mapPost));
-  return post || null;
+  return mapPost(post);
 }
 
 async function getPosts(options = {}) {
-  const { page, pageSize } = normalizePagination(options.page, options.pageSize);
-  const { limitSql } = buildPaginationClause(page, pageSize);
-  const { whereSql, params } = buildPostFilterWhereClause(options);
-  const countRows = await query(`
-    SELECT COUNT(*) AS total
-    FROM posts
-    ${whereSql}
-  `, params);
-  const totalPosts = countRows[0] ? countRows[0].total : 0;
-
-  const rows = await query(`
-    SELECT
-      posts.id,
-      posts.title,
-      posts.author_name,
-      posts.location,
-      posts.image_path,
-      posts.image_public_id,
-      posts.content,
-      posts.featured,
-      posts.featured_until,
-      posts.created_at,
-      posts.updated_at
-    FROM posts
-    ${whereSql}
-    ORDER BY posts.created_at DESC
-    ${limitSql}
-  `, params);
-
-  const posts = await attachTags(rows.map(mapPost));
+  const { page, pageSize, skip } = normalizePagination(options.page, options.pageSize);
+  const where = buildWhereClause(options);
+  const [totalPosts, posts] = await prisma.$transaction([
+    prisma.post.count({ where }),
+    prisma.post.findMany({
+      where,
+      include: POSTS_INCLUDE,
+      orderBy: [
+        {
+          featured: 'desc',
+        },
+        {
+          createdAt: 'desc',
+        },
+      ],
+      skip,
+      take: pageSize,
+    }),
+  ]);
 
   return {
-    posts,
+    posts: posts.map(mapPost),
     totalPosts,
     currentPage: page,
     pageSize,
@@ -218,113 +193,102 @@ async function getPosts(options = {}) {
 }
 
 async function getAllPosts() {
-  const listing = await getPosts({ page: 1, pageSize: 1000 });
-  return listing.posts;
+  const posts = await prisma.post.findMany({
+    include: POSTS_INCLUDE,
+    orderBy: {
+      createdAt: 'desc',
+    },
+  });
+
+  return posts.map(mapPost);
 }
 
 async function getAllTags() {
-  const rows = await query(`
-    SELECT id, name, slug
-    FROM tags
-    ORDER BY name ASC
-  `);
+  const tags = await prisma.tag.findMany({
+    orderBy: {
+      name: 'asc',
+    },
+  });
 
-  return rows.map(mapTag);
+  return tags.map(mapTag);
 }
 
 async function createPost(post) {
   const editorToken = crypto.randomBytes(32).toString('hex');
-  const connection = await pool.getConnection();
-
-  try {
-    await connection.beginTransaction();
-
-    const [result] = await connection.execute(`
-      INSERT INTO posts (
-        title,
-        author_name,
-        location,
-        image_path,
-        image_public_id,
-        editor_token,
-        content
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `, [
-      post.title,
-      post.authorName,
-      post.location,
-      post.imagePath,
-      post.imagePublicId,
+  const tags = await getTagsBySlugs(post.tagSlugs);
+  const createdPost = await prisma.post.create({
+    data: {
+      title: post.title,
+      authorName: post.authorName,
+      location: post.location || null,
+      latitude: typeof post.latitude === 'number' ? post.latitude : null,
+      longitude: typeof post.longitude === 'number' ? post.longitude : null,
+      imagePath: post.imagePath,
+      imagePublicId: post.imagePublicId || null,
       editorToken,
-      post.content,
-    ]);
+      content: post.content,
+      postTags: tags.length
+        ? {
+            create: buildTagWrites(tags),
+          }
+        : undefined,
+    },
+  });
 
-    await replacePostTags(connection, result.insertId, post.tagSlugs);
-    await connection.commit();
-
-    return {
-      id: result.insertId,
-      editorToken,
-    };
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
+  return {
+    id: createdPost.id,
+    editorToken,
+  };
 }
 
 async function updatePost(id, post) {
-  const connection = await pool.getConnection();
+  const tags = await getTagsBySlugs(post.tagSlugs);
 
-  try {
-    await connection.beginTransaction();
-
-    await connection.execute(`
-      UPDATE posts
-      SET
-        title = ?,
-        author_name = ?,
-        location = ?,
-        image_path = ?,
-        image_public_id = ?,
-        content = ?
-      WHERE id = ?
-    `, [
-      post.title,
-      post.authorName,
-      post.location,
-      post.imagePath,
-      post.imagePublicId,
-      post.content,
-      id,
-    ]);
-
-    await replacePostTags(connection, id, post.tagSlugs);
-    await connection.commit();
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
+  await prisma.post.update({
+    where: {
+      id: Number(id),
+    },
+    data: {
+      title: post.title,
+      authorName: post.authorName,
+      location: post.location || null,
+      latitude: typeof post.latitude === 'number' ? post.latitude : null,
+      longitude: typeof post.longitude === 'number' ? post.longitude : null,
+      imagePath: post.imagePath,
+      imagePublicId: post.imagePublicId || null,
+      content: post.content,
+      postTags: {
+        deleteMany: {},
+        ...(tags.length
+          ? {
+              create: buildTagWrites(tags),
+            }
+          : {}),
+      },
+    },
+  });
 }
 
 async function deletePost(id) {
-  await query('DELETE FROM posts WHERE id = ?', [id]);
+  await prisma.post.delete({
+    where: {
+      id: Number(id),
+    },
+  });
 }
 
 async function validateEditorToken(id, editorToken) {
-  const rows = await query(`
-    SELECT id
-    FROM posts
-    WHERE id = ?
-      AND editor_token = ?
-    LIMIT 1
-  `, [id, editorToken]);
+  const post = await prisma.post.findFirst({
+    where: {
+      id: Number(id),
+      editorToken,
+    },
+    select: {
+      id: true,
+    },
+  });
 
-  return Boolean(rows[0]);
+  return Boolean(post);
 }
 
 async function searchPosts(searchQuery, options = {}) {
@@ -335,65 +299,106 @@ async function searchPosts(searchQuery, options = {}) {
 }
 
 async function getFeaturedPost() {
-  await query(`
-    UPDATE posts
-    SET featured = FALSE, featured_until = NULL
-    WHERE featured = TRUE
-      AND featured_until IS NOT NULL
-      AND featured_until < NOW()
-  `);
+  await prisma.post.updateMany({
+    where: {
+      featured: true,
+      featuredUntil: {
+        lt: new Date(),
+      },
+    },
+    data: {
+      featured: false,
+      featuredUntil: null,
+    },
+  });
 
-  const rows = await query(`
-    SELECT
-      posts.id,
-      posts.title,
-      posts.author_name,
-      posts.location,
-      posts.image_path,
-      posts.image_public_id,
-      posts.content,
-      posts.featured,
-      posts.featured_until,
-      posts.created_at,
-      posts.updated_at
-    FROM posts
-    WHERE posts.featured = TRUE
-      AND (posts.featured_until IS NULL OR posts.featured_until >= NOW())
-    ORDER BY posts.featured_until DESC, posts.updated_at DESC
-    LIMIT 1
-  `);
+  const post = await prisma.post.findFirst({
+    where: {
+      featured: true,
+      OR: [
+        {
+          featuredUntil: null,
+        },
+        {
+          featuredUntil: {
+            gte: new Date(),
+          },
+        },
+      ],
+    },
+    include: POSTS_INCLUDE,
+    orderBy: [
+      {
+        featuredUntil: 'desc',
+      },
+      {
+        updatedAt: 'desc',
+      },
+    ],
+  });
 
-  const [post] = await attachTags(rows.map(mapPost));
-  return post || null;
+  return mapPost(post);
 }
 
 async function featurePost(id) {
-  const connection = await pool.getConnection();
+  await prisma.$transaction([
+    prisma.post.updateMany({
+      where: {
+        featured: true,
+      },
+      data: {
+        featured: false,
+        featuredUntil: null,
+      },
+    }),
+    prisma.post.update({
+      where: {
+        id: Number(id),
+      },
+      data: {
+        featured: true,
+        featuredUntil: new Date(Date.now() + (7 * 24 * 60 * 60 * 1000)),
+      },
+    }),
+  ]);
+}
 
-  try {
-    await connection.beginTransaction();
+async function getMapDestinations() {
+  const posts = await prisma.post.findMany({
+    where: {
+      latitude: {
+        not: null,
+      },
+      longitude: {
+        not: null,
+      },
+    },
+    include: POSTS_INCLUDE,
+    orderBy: [
+      {
+        featured: 'desc',
+      },
+      {
+        createdAt: 'desc',
+      },
+    ],
+    take: 40,
+  });
 
-    await connection.execute(`
-      UPDATE posts
-      SET featured = FALSE, featured_until = NULL
-      WHERE featured = TRUE
-    `);
+  return posts.map((post) => {
+    const mappedPost = mapPost(post);
 
-    await connection.execute(`
-      UPDATE posts
-      SET
-        featured = TRUE,
-        featured_until = DATE_ADD(NOW(), INTERVAL 7 DAY)
-      WHERE id = ?
-    `, [id]);
-
-    await connection.commit();
-  } catch (error) {
-    await connection.rollback();
-    throw error;
-  } finally {
-    connection.release();
-  }
+    return {
+      id: mappedPost.id,
+      title: mappedPost.title,
+      location: mappedPost.location,
+      latitude: mappedPost.latitude,
+      longitude: mappedPost.longitude,
+      imagePath: mappedPost.imagePath,
+      tags: mappedPost.tags,
+      featured: mappedPost.featured,
+    };
+  });
 }
 
 module.exports = {
@@ -408,4 +413,5 @@ module.exports = {
   searchPosts,
   getFeaturedPost,
   featurePost,
+  getMapDestinations,
 };

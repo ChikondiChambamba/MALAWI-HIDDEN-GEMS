@@ -1,19 +1,33 @@
 <%- include('partials/header') %>
 
-<section class="about">
-  <h1>About Malawi Hidden Gems</h1>
-  <p>This blog is a community platform where travelers and locals share stories, tips, and adventures from across Malawi.
-    Our goal is to showcase the beauty, culture, and people of the Warm Heart of Africa.</p>
-
-  <h2>What You'll Find Here</h2>
-  <ul>
-    <li>Cultural stories</li>
-    <li>Adventure highlights</li>
-    <li>Personal experiences from contributors</li>
-  </ul>
-
-  <h2>How Posting Works</h2>
-  <p>Anyone can create and publish a post without creating an account. Each new post gets a private editor token stored in the creator's browser so only that contributor can edit or delete it later.</p>
+<section class="surface-panel overflow-hidden">
+  <div class="grid gap-8 p-8 md:p-12 lg:grid-cols-[0.95fr_1.05fr]">
+    <div>
+      <p class="eyebrow">About the platform</p>
+      <h1 class="mt-4 font-display text-5xl leading-none text-ink-900 md:text-6xl">Malawi discovery, designed with more care and less friction.</h1>
+    </div>
+    <div class="space-y-5 text-base leading-8 text-ink-700">
+      <p>Malawi Hidden Gems is a tourism storytelling platform for travelers and locals who want a cleaner, more premium way to document the places that make Malawi unforgettable.</p>
+      <p>We focus on graceful mobile experiences, resilient offline access, high-quality imagery, and destination discovery that still feels polished on slower networks and smaller devices.</p>
+    </div>
+  </div>
+  <div class="grid gap-px bg-black/5 lg:grid-cols-3">
+    <div class="bg-white px-8 py-8">
+      <p class="eyebrow">Editorial</p>
+      <h2 class="mt-3 font-display text-3xl text-ink-900">Human stories first.</h2>
+      <p class="mt-4 text-sm leading-7 text-ink-700">Travel memories, local food, adventure routes, wildlife highlights, and regional insights are all shaped into calm, readable experiences.</p>
+    </div>
+    <div class="bg-white px-8 py-8">
+      <p class="eyebrow">Technical</p>
+      <h2 class="mt-3 font-display text-3xl text-ink-900">Built for unstable internet.</h2>
+      <p class="mt-4 text-sm leading-7 text-ink-700">The app uses optimized image delivery, offline caching, and progressive enhancement so browsing still feels dependable in remote destinations.</p>
+    </div>
+    <div class="bg-white px-8 py-8">
+      <p class="eyebrow">Ownership</p>
+      <h2 class="mt-3 font-display text-3xl text-ink-900">Anonymous, but protected.</h2>
+      <p class="mt-4 text-sm leading-7 text-ink-700">Contributors can publish without accounts while editor tokens stay in the browser, making post updates simple without opening everything to the public.</p>
+    </div>
+  </div>
 </section>
 
 <%- include('partials/footer') %>

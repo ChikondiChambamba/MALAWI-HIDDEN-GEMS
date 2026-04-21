@@ -1,10 +1,17 @@
 const Contact = require('../models/contactModel');
 const { sanitizePlainText, sanitizeRichText } = require('../utils/text');
+const { buildSeoMeta } = require('../utils/seo');
 
 function renderContactForm(req, res) {
   res.render('contact', {
     title: 'Contact Malawi Hidden Gems',
     pageDescription: 'Contact the Malawi Hidden Gems team with questions, feedback, or partnership ideas.',
+    seo: buildSeoMeta({
+      title: 'Contact Malawi Hidden Gems',
+      description: 'Reach the Malawi Hidden Gems team for questions, partnerships, and editorial feedback.',
+      pathname: req.originalUrl,
+      image: '/images/logo.png',
+    }),
     form: {
       name: '',
       email: '',
@@ -24,6 +31,12 @@ async function submitContactForm(req, res) {
     return res.status(400).render('contact', {
       title: 'Contact Malawi Hidden Gems',
       pageDescription: 'Contact the Malawi Hidden Gems team with questions, feedback, or partnership ideas.',
+      seo: buildSeoMeta({
+        title: 'Contact Malawi Hidden Gems',
+        description: 'Reach the Malawi Hidden Gems team for questions, partnerships, and editorial feedback.',
+        pathname: req.originalUrl,
+        image: '/images/logo.png',
+      }),
       error: 'Name, email, and message are all required.',
       form,
     });
@@ -35,6 +48,12 @@ async function submitContactForm(req, res) {
     return res.status(400).render('contact', {
       title: 'Contact Malawi Hidden Gems',
       pageDescription: 'Contact the Malawi Hidden Gems team with questions, feedback, or partnership ideas.',
+      seo: buildSeoMeta({
+        title: 'Contact Malawi Hidden Gems',
+        description: 'Reach the Malawi Hidden Gems team for questions, partnerships, and editorial feedback.',
+        pathname: req.originalUrl,
+        image: '/images/logo.png',
+      }),
       error: 'Please enter a valid email address.',
       form,
     });
@@ -45,6 +64,12 @@ async function submitContactForm(req, res) {
   res.render('contact', {
     title: 'Contact Malawi Hidden Gems',
     pageDescription: 'Contact the Malawi Hidden Gems team with questions, feedback, or partnership ideas.',
+    seo: buildSeoMeta({
+      title: 'Contact Malawi Hidden Gems',
+      description: 'Reach the Malawi Hidden Gems team for questions, partnerships, and editorial feedback.',
+      pathname: req.originalUrl,
+      image: '/images/logo.png',
+    }),
     success: 'Thanks for reaching out. Your message has been received.',
     form: {
       name: '',

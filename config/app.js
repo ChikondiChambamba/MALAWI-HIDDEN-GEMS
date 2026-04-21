@@ -1,6 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const path = require('path');
+const compression = require('compression');
 const methodOverride = require('method-override');
 const session = require('express-session');
 const env = require('./env');
@@ -20,16 +21,19 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
 
 app.locals.siteName = 'Malawi Hidden Gems';
+app.locals.siteUrl = env.siteUrl;
 
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", 'cdnjs.cloudflare.com'],
+      scriptSrc: ["'self'"],
       styleSrc: ["'self'", 'fonts.googleapis.com'],
-      imgSrc: ["'self'", 'res.cloudinary.com'],
+      imgSrc: ["'self'", 'data:', 'https://res.cloudinary.com', 'https://*.basemaps.cartocdn.com'],
       fontSrc: ["'self'", 'fonts.gstatic.com'],
       connectSrc: ["'self'"],
+      workerSrc: ["'self'"],
+      manifestSrc: ["'self'"],
       objectSrc: ["'none'"],
       baseUri: ["'self'"],
       formAction: ["'self'"],
@@ -40,6 +44,8 @@ app.use(helmet({
 }));
 app.use(securityHeaders);
 app.use(requestLogger);
+app.use(compression());
+app.use('/vendor/leaflet', express.static(path.join(__dirname, '..', 'node_modules', 'leaflet', 'dist')));
 app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -59,6 +65,9 @@ app.use(session({
 app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   res.locals.isAdmin = Boolean(req.session && req.session.isAdmin);
+  res.locals.currentUrl = `${env.siteUrl}${req.originalUrl}`;
+  res.locals.seo = null;
+  res.locals.structuredData = [];
   next();
 });
 

@@ -1,66 +1,75 @@
 <%- include('partials/header') %>
 
-<section class="form-section">
-  <h2>Create New Post</h2>
-
-  <% if (typeof error !== 'undefined') { %>
-    <div class="error-message">
-      <p><%= error %></p>
-    </div>
-  <% } %>
-
-  <form action="/posts" method="POST" class="post-form" enctype="multipart/form-data">
-    <div class="form-group">
-      <label for="title">Title:</label>
-      <input type="text" id="title" name="title" value="<%= form.title %>" required>
+<section class="mx-auto max-w-4xl">
+  <div class="surface-panel p-8 md:p-10">
+    <div class="max-w-2xl">
+      <p class="eyebrow">New contribution</p>
+      <h1 class="mt-4 font-display text-5xl leading-none text-ink-900">Share a hidden gem beautifully.</h1>
+      <p class="mt-5 text-base leading-8 text-ink-700">Create a premium destination story with optional map coordinates, curated tags, and optimized imagery for travelers on every kind of connection.</p>
     </div>
 
-    <div class="form-group">
-      <label for="authorName">Your Name:</label>
-      <input type="text" id="authorName" name="authorName" value="<%= form.authorName %>" placeholder="Anonymous traveler">
-    </div>
-
-    <div class="form-group">
-      <label for="location">Location in Malawi:</label>
-      <input type="text" id="location" name="location" value="<%= form.location %>" placeholder="Cape Maclear, Mulanje, Zomba...">
-    </div>
-
-    <div class="form-group">
-      <label for="image">Blog Image:</label>
-      <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif,.webp,image/*">
-      <div class="preview-stack" id="imagePreview" aria-hidden="true">
-        <img src="" alt="Selected image preview" id="imagePreviewTag" class="preview-image is-hidden">
+    <% if (typeof error !== 'undefined') { %>
+      <div class="mt-6 rounded-[1.6rem] border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+        <%= error %>
       </div>
-      <small>Select an image for your blog post (JPG, PNG, GIF, or WEBP, max 5MB)</small>
-    </div>
+    <% } %>
 
-    <div class="form-group">
-      <label for="content">Content:</label>
-      <textarea id="content" name="content" rows="10" required><%= form.content %></textarea>
-    </div>
-
-    <div class="form-group">
-      <p class="checkbox-group__label">Tags</p>
-      <div class="checkbox-grid">
-        <% tags.forEach((tag) => { %>
-          <label class="checkbox-pill">
-            <input
-              type="checkbox"
-              name="tagSlugs"
-              value="<%= tag.slug %>"
-              <%= form.tagSlugs.includes(tag.slug) ? 'checked' : '' %>
-            >
-            <span><%= tag.name %></span>
-          </label>
-        <% }) %>
+    <form action="/posts" method="POST" enctype="multipart/form-data" class="mt-8 grid gap-8">
+      <div class="grid gap-6 md:grid-cols-2">
+        <div class="md:col-span-2">
+          <label for="title" class="mb-2 block text-sm font-semibold text-ink-900">Story title</label>
+          <input type="text" id="title" name="title" value="<%= form.title %>" required class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
+        </div>
+        <div>
+          <label for="authorName" class="mb-2 block text-sm font-semibold text-ink-900">Your name</label>
+          <input type="text" id="authorName" name="authorName" value="<%= form.authorName %>" placeholder="Anonymous traveler" class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
+        </div>
+        <div>
+          <label for="location" class="mb-2 block text-sm font-semibold text-ink-900">Location in Malawi</label>
+          <input type="text" id="location" name="location" value="<%= form.location %>" placeholder="Cape Maclear, Mulanje, Zomba..." class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
+        </div>
+        <div>
+          <label for="latitude" class="mb-2 block text-sm font-semibold text-ink-900">Latitude</label>
+          <input type="number" step="any" id="latitude" name="latitude" value="<%= form.latitude ?? '' %>" placeholder="-13.9626" class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
+        </div>
+        <div>
+          <label for="longitude" class="mb-2 block text-sm font-semibold text-ink-900">Longitude</label>
+          <input type="number" step="any" id="longitude" name="longitude" value="<%= form.longitude ?? '' %>" placeholder="34.8389" class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
+        </div>
       </div>
-    </div>
 
-    <div class="form-actions">
-      <button type="submit" class="btn primary">Create Post</button>
-      <a href="/posts" class="btn secondary">Cancel</a>
-    </div>
-  </form>
+      <div>
+        <label for="image" class="mb-2 block text-sm font-semibold text-ink-900">Destination image</label>
+        <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif,.webp,image/*" class="block w-full rounded-[1.4rem] border border-dashed border-black/15 bg-sand-50 px-5 py-4 text-sm text-ink-700 file:mr-4 file:rounded-full file:border-0 file:bg-forest-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-forest-700">
+        <p class="mt-3 text-sm leading-7 text-ink-700">Optimized automatically with Sharp and delivered through Cloudinary for fast mobile performance.</p>
+        <div class="mt-4" id="imagePreview" aria-hidden="true">
+          <img src="" alt="Selected image preview" id="imagePreviewTag" class="hidden h-64 w-full rounded-[1.6rem] object-cover">
+        </div>
+      </div>
+
+      <div>
+        <label for="content" class="mb-2 block text-sm font-semibold text-ink-900">Story content</label>
+        <textarea id="content" name="content" rows="8" required class="min-h-[220px] w-full rounded-[1.6rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm leading-7 text-ink-900 outline-none focus:border-forest-300 focus:bg-white"><%= form.content %></textarea>
+      </div>
+
+      <div>
+        <p class="mb-3 text-sm font-semibold text-ink-900">Tags</p>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <% tags.forEach((tag) => { %>
+            <label class="flex cursor-pointer items-center gap-3 rounded-[1.3rem] border border-black/10 bg-sand-50 px-4 py-3 text-sm font-medium text-ink-800 transition hover:border-forest-200 hover:bg-white">
+              <input type="checkbox" name="tagSlugs" value="<%= tag.slug %>" <%= form.tagSlugs.includes(tag.slug) ? 'checked' : '' %> class="h-4 w-4 rounded border-black/20 text-forest-600 focus:ring-forest-300">
+              <span><%= tag.name %></span>
+            </label>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-3 border-t border-black/5 pt-6 sm:flex-row">
+        <button type="submit" class="inline-flex items-center justify-center rounded-full bg-forest-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-forest-600/20 hover:bg-forest-700">Publish story</button>
+        <a href="/posts" class="inline-flex items-center justify-center rounded-full border border-black/10 px-6 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Cancel</a>
+      </div>
+    </form>
+  </div>
 </section>
 
 <%- include('partials/footer') %>

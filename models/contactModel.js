@@ -1,10 +1,13 @@
-const { query } = require('../config/database');
+const { prisma } = require('../config/prisma');
 
 async function createContact(contact) {
-  await query(`
-    INSERT INTO contacts (name, email, message)
-    VALUES (?, ?, ?)
-  `, [contact.name, contact.email, contact.message]);
+  await prisma.contact.create({
+    data: {
+      name: contact.name,
+      email: contact.email,
+      message: contact.message,
+    },
+  });
 }
 
 module.exports = {

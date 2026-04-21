@@ -6,18 +6,31 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "init-db": "node scripts/init-db.js",
+    "build:css": "npx @tailwindcss/cli -i ./assets/tailwind.css -o ./public/css/tailwind.css --minify",
+    "dev:css": "npx @tailwindcss/cli -i ./assets/tailwind.css -o ./public/css/tailwind.css --watch",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:deploy": "prisma migrate deploy",
+    "prisma:seed": "node prisma/seed.js",
+    "init-db": "npm run prisma:generate && npm run prisma:push && npm run prisma:seed",
     "check": "node --check app.js",
     "test": "jest --runInBand"
   },
   "dependencies": {
+    "@prisma/adapter-mariadb": "^7.7.0",
+    "@prisma/client": "^7.7.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "cloudinary": "^1.41.3",
+    "compression": "^1.8.1",
+    "dotenv": "^17.4.2",
     "ejs": "^3.1.10",
     "express": "^4.18.2",
     "express-session": "^1.17.3",
     "helmet": "^8.1.0",
+    "leaflet": "^1.9.4",
+    "mariadb": "^3.5.2",
     "method-override": "^3.0.0",
     "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0",
@@ -27,8 +40,13 @@
     "tedious": "^18.6.1"
   },
   "devDependencies": {
+    "@tailwindcss/cli": "^4.2.4",
+    "autoprefixer": "^10.5.0",
     "jest": "^30.3.0",
     "nodemon": "^3.0.1",
-    "supertest": "^7.2.2"
+    "postcss": "^8.5.10",
+    "prisma": "^7.7.0",
+    "supertest": "^7.2.2",
+    "tailwindcss": "^4.2.4"
   }
 }

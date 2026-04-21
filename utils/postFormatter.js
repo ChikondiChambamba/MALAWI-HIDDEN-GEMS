@@ -16,6 +16,25 @@ function chooseValue(primaryValue, fallbackValue = '') {
   return typeof primaryValue === 'string' ? primaryValue : fallbackValue;
 }
 
+function normalizeCoordinate(value, fallbackValue = null) {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value !== 'string') {
+    return fallbackValue;
+  }
+
+  const trimmedValue = value.trim();
+
+  if (!trimmedValue) {
+    return null;
+  }
+
+  const parsedValue = Number.parseFloat(trimmedValue);
+  return Number.isFinite(parsedValue) ? parsedValue : fallbackValue;
+}
+
 function buildPostFormData(source = {}, file = null, fallback = {}) {
   const title = chooseValue(source.title, fallback.title);
   const authorName = chooseValue(source.authorName, fallback.authorName);
@@ -26,6 +45,8 @@ function buildPostFormData(source = {}, file = null, fallback = {}) {
     title: sanitizePlainText(title, 255),
     authorName: sanitizePlainText(authorName, 120) || 'Anonymous traveler',
     location: sanitizePlainText(location, 120),
+    latitude: normalizeCoordinate(source.latitude, fallback.latitude ?? null),
+    longitude: normalizeCoordinate(source.longitude, fallback.longitude ?? null),
     content: sanitizeRichText(content, 25000),
     imagePath: source.imagePath || fallback.imagePath || 'default.jpg',
     tagSlugs: normalizeTagSlugs(source.tagSlugs || source.tags || fallback.tagSlugs || []),
@@ -38,6 +59,23 @@ function validatePostPayload(post) {
     return {
       isValid: false,
       message: 'Title and story content are required.',
+    };
+  }
+
+  const hasLatitude = typeof post.latitude === 'number';
+  const hasLongitude = typeof post.longitude === 'number';
+
+  if (hasLatitude !== hasLongitude) {
+    return {
+      isValid: false,
+      message: 'Please provide both latitude and longitude for the map preview, or leave both blank.',
+    };
+  }
+
+  if (hasLatitude && (post.latitude < -90 || post.latitude > 90 || post.longitude < -180 || post.longitude > 180)) {
+    return {
+      isValid: false,
+      message: 'Latitude must be between -90 and 90, and longitude must be between -180 and 180.',
     };
   }
 

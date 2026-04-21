@@ -1,19 +1,19 @@
 const app = require('./config/app');
 const env = require('./config/env');
-const { ensureSchema, closePool } = require('./config/database');
+const { connectPrisma, disconnectPrisma } = require('./config/prisma');
 
 async function startServer() {
   try {
-    await ensureSchema();
+    await connectPrisma();
 
     const server = app.listen(env.port, () => {
-      console.log(`Malawi Tourism Blog is running on port ${env.port}`);
+      console.log(`Malawi Hidden Gems is running on port ${env.port}`);
     });
 
     const shutdown = async (signal) => {
       console.log(`${signal} received. Shutting down gracefully...`);
       server.close(async () => {
-        await closePool();
+        await disconnectPrisma();
         process.exit(0);
       });
     };

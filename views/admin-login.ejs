@@ -1,26 +1,28 @@
 <%- include('partials/header') %>
 
-<section class="form-section">
-  <h2>Admin Login</h2>
-  <p>Enter the admin password to manage featured gems and moderate posts.</p>
+<section class="mx-auto max-w-xl">
+  <div class="surface-panel p-8 md:p-10">
+    <p class="eyebrow">Protected area</p>
+    <h1 class="mt-4 font-display text-5xl leading-none text-ink-900">Admin access for moderation and featured stories.</h1>
+    <p class="mt-5 text-base leading-8 text-ink-700">Use the configured admin password to manage highlighted content and maintain the quality of published gems.</p>
 
-  <% if (typeof error !== 'undefined') { %>
-    <div class="error-message">
-      <p><%= error %></p>
-    </div>
-  <% } %>
+    <% if (typeof error !== 'undefined') { %>
+      <div class="mt-6 rounded-[1.6rem] border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+        <%= error %>
+      </div>
+    <% } %>
 
-  <form action="/admin/login" method="POST">
-    <div class="form-group">
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required>
-    </div>
-
-    <div class="form-actions">
-      <button type="submit" class="btn primary">Login</button>
-      <a href="/posts" class="btn secondary">Cancel</a>
-    </div>
-  </form>
+    <form action="/admin/login" method="POST" class="mt-8 grid gap-6">
+      <div>
+        <label for="password" class="mb-2 block text-sm font-semibold text-ink-900">Admin password</label>
+        <input type="password" id="password" name="password" required class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
+      </div>
+      <div class="flex flex-col gap-3 sm:flex-row">
+        <button type="submit" class="inline-flex items-center justify-center rounded-full bg-forest-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-forest-600/20 hover:bg-forest-700">Login</button>
+        <a href="/posts" class="inline-flex items-center justify-center rounded-full border border-black/10 px-6 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Back to site</a>
+      </div>
+    </form>
+  </div>
 </section>
 
 <%- include('partials/footer') %>

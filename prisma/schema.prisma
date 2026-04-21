@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model Post {
+  id            Int       @id @default(autoincrement())
+  title         String    @db.VarChar(255)
+  authorName    String    @map("author_name") @db.VarChar(120)
+  location      String?   @db.VarChar(120)
+  latitude      Float?
+  longitude     Float?
+  imagePath     String    @map("image_path") @db.VarChar(500)
+  imagePublicId String?   @map("image_public_id") @db.VarChar(255)
+  editorToken   String    @map("editor_token") @db.VarChar(128)
+  content       String    @db.Text
+  featured      Boolean   @default(false)
+  featuredUntil DateTime? @map("featured_until")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  postTags      PostTag[]
+
+  @@index([createdAt(sort: Desc)])
+  @@index([featured, featuredUntil])
+  @@index([location])
+  @@map("posts")
+}
+
+model Contact {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  message   String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt(sort: Desc)])
+  @@map("contacts")
+}
+
+model Tag {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique(map: "name") @db.VarChar(120)
+  slug      String    @unique(map: "slug") @db.VarChar(140)
+  createdAt DateTime  @default(now()) @map("created_at")
+  postTags  PostTag[]
+
+  @@map("tags")
+}
+
+model PostTag {
+  postId Int  @map("post_id")
+  tagId  Int  @map("tag_id")
+  post   Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  tag    Tag  @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([postId, tagId])
+  @@index([tagId], map: "post_tags_tag_id_fkey")
+  @@map("post_tags")
+}

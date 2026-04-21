@@ -1,60 +1,101 @@
 <%- include('partials/header') %>
 
-<article class="full-post">
-  <% if (issuedEditorToken) { %>
-    <div
-      class="success-message editor-token-notice"
-      data-issued-editor-token="<%= issuedEditorToken %>"
-      data-issued-post-id="<%= post.id %>"
-    >
-      <div>
-        <strong>Your editor token has been saved in this browser.</strong>
-        <p>Keep this token safe if you want a backup for editing or deleting this post later.</p>
-        <code><%= issuedEditorToken %></code>
+<article class="grid gap-8 lg:grid-cols-[1.1fr_0.55fr]">
+  <div class="surface-panel overflow-hidden">
+    <% if (issuedEditorToken) { %>
+      <div class="border-b border-emerald-100 bg-emerald-50/80 px-6 py-5 text-sm text-emerald-800 md:px-8" data-issued-editor-token="<%= issuedEditorToken %>" data-issued-post-id="<%= post.id %>">
+        <strong class="block font-semibold">Your editor token has been saved in this browser.</strong>
+        <p class="mt-2 leading-7">Keep a copy if you want a backup for editing or deleting this story later.</p>
+        <code class="mt-3 block overflow-x-auto rounded-2xl bg-white px-4 py-3 text-xs text-ink-800"><%= issuedEditorToken %></code>
+      </div>
+    <% } %>
+
+    <% if (post.imagePath && post.imagePath !== 'default.jpg') { %>
+      <div class="relative h-[320px] md:h-[440px]">
+        <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="absolute inset-0 h-full w-full object-cover" fetchpriority="high">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
+      </div>
+    <% } %>
+
+    <div class="px-6 py-8 md:px-10 md:py-10">
+      <p class="eyebrow">Destination story</p>
+      <h1 class="mt-4 font-display text-5xl leading-none text-ink-900 md:text-6xl"><%= post.title %></h1>
+      <div class="mt-5 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-forest-500">
+        <span><%= post.authorName %></span>
+        <% if (post.location) { %><span><%= post.location %></span><% } %>
+        <span><%= post.readTime %></span>
+        <span>Updated <%= new Date(post.updatedAt).toDateString() %></span>
+      </div>
+
+      <% if (post.tags.length) { %>
+        <div class="mt-6 flex flex-wrap gap-2">
+          <% post.tags.forEach((tag) => { %>
+            <a href="/posts?tag=<%= tag.slug %>" class="rounded-full bg-sand-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-forest-700 hover:bg-sand-200"><%= tag.name %></a>
+          <% }) %>
+        </div>
+      <% } %>
+
+      <div class="destination-body mt-8">
+        <%- post.formattedContent %>
       </div>
     </div>
-  <% } %>
-
-  <h2><%= post.title %></h2>
-
-  <div class="post-meta">
-    <span><%= post.authorName %></span>
-    <% if (post.location) { %>
-      <span><%= post.location %></span>
-    <% } %>
-    <span>Shared on <%= new Date(post.createdAt).toDateString() %></span>
-    <span>Updated <%= new Date(post.updatedAt).toDateString() %></span>
-    <span><%= post.readTime %></span>
   </div>
 
-  <% if (post.tags.length) { %>
-    <div class="tag-list">
-      <% post.tags.forEach((tag) => { %>
-        <a href="/posts?tag=<%= tag.slug %>" class="tag-pill"><%= tag.name %></a>
-      <% }) %>
-    </div>
-  <% } %>
+  <aside class="space-y-6">
+    <section class="glass-panel p-6">
+      <p class="eyebrow">About this story</p>
+      <dl class="mt-5 space-y-4 text-sm leading-7 text-ink-700">
+        <div>
+          <dt class="font-semibold text-ink-900">Published</dt>
+          <dd><%= new Date(post.createdAt).toDateString() %></dd>
+        </div>
+        <div>
+          <dt class="font-semibold text-ink-900">Contributor</dt>
+          <dd><%= post.authorName %></dd>
+        </div>
+        <% if (post.location) { %>
+          <div>
+            <dt class="font-semibold text-ink-900">Location</dt>
+            <dd><%= post.location %></dd>
+          </div>
+        <% } %>
+        <div>
+          <dt class="font-semibold text-ink-900">Reading time</dt>
+          <dd><%= post.readTime %></dd>
+        </div>
+      </dl>
+    </section>
 
-  <% if (post.imagePath && post.imagePath !== 'default.jpg') { %>
-    <div class="post-image">
-      <img src="<%= post.imageUrl %>" alt="<%= post.title %>">
-    </div>
-  <% } %>
+    <section data-map-shell class="surface-panel overflow-hidden">
+      <div class="border-b border-black/5 px-6 py-5">
+        <p class="eyebrow">Location preview</p>
+        <h2 class="mt-2 font-display text-3xl text-ink-900">See where this gem lives.</h2>
+      </div>
+      <div class="h-[280px]">
+        <div
+          class="h-full w-full"
+          data-map-mode="single"
+          data-latitude="<%= typeof post.latitude === 'number' ? post.latitude : '' %>"
+          data-longitude="<%= typeof post.longitude === 'number' ? post.longitude : '' %>"
+          data-title="<%= post.title %>"
+          data-location="<%= post.location || 'Malawi' %>"
+        ></div>
+      </div>
+    </section>
 
-  <div class="post-content">
-    <%- post.formattedContent %>
-  </div>
-
-  <div class="post-actions">
-    <a href="/posts" class="btn secondary">Back to All Experiences</a>
-    <div class="editor-controls" data-post-id="<%= post.id %>">
-      <a href="/posts/<%= post.id %>/edit" class="btn primary editor-edit-link">Edit This Experience</a>
-      <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form editor-delete-form" data-post-id="<%= post.id %>">
-        <input type="hidden" name="editorToken" class="editor-token-field">
-        <button type="submit" class="btn danger">Delete Experience</button>
-      </form>
-    </div>
-  </div>
+    <section class="surface-panel p-6">
+      <div class="flex flex-col gap-3">
+        <a href="/posts" class="inline-flex items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Back to all experiences</a>
+        <div class="editor-controls hidden flex-col gap-3" data-post-id="<%= post.id %>">
+          <a href="/posts/<%= post.id %>/edit" class="editor-edit-link inline-flex items-center justify-center rounded-full bg-forest-600 px-5 py-3 text-sm font-semibold text-white hover:bg-forest-700">Edit this experience</a>
+          <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form editor-delete-form" data-post-id="<%= post.id %>">
+            <input type="hidden" name="editorToken" class="editor-token-field">
+            <button type="submit" class="w-full rounded-full border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100">Delete experience</button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </aside>
 </article>
 
 <%- include('partials/footer') %>

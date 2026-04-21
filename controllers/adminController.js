@@ -6,6 +6,7 @@ const {
   resolveImageUrl,
 } = require('../utils/postFormatter');
 const { removeImageIfManagedUpload } = require('../utils/fileManager');
+const { buildSeoMeta } = require('../utils/seo');
 
 function renderLogin(req, res) {
   if (req.session && req.session.isAdmin) {
@@ -15,6 +16,13 @@ function renderLogin(req, res) {
   return res.render('admin-login', {
     title: 'Admin Login | Malawi Hidden Gems',
     pageDescription: 'Administrator login for Malawi Hidden Gems.',
+    seo: buildSeoMeta({
+      title: 'Admin Login | Malawi Hidden Gems',
+      description: 'Administrative access for Malawi Hidden Gems.',
+      pathname: req.originalUrl,
+      image: '/images/logo.png',
+      noIndex: true,
+    }),
   });
 }
 
@@ -25,6 +33,13 @@ function login(req, res) {
     return res.status(401).render('admin-login', {
       title: 'Admin Login | Malawi Hidden Gems',
       pageDescription: 'Administrator login for Malawi Hidden Gems.',
+      seo: buildSeoMeta({
+        title: 'Admin Login | Malawi Hidden Gems',
+        description: 'Administrative access for Malawi Hidden Gems.',
+        pathname: req.originalUrl,
+        image: '/images/logo.png',
+        noIndex: true,
+      }),
       error: 'Invalid admin password.',
     });
   }
@@ -43,6 +58,13 @@ async function dashboard(req, res) {
   res.render('admin-dashboard', {
     title: 'Admin Dashboard | Malawi Hidden Gems',
     pageDescription: 'Administrator dashboard for managing published Malawi Hidden Gems posts.',
+    seo: buildSeoMeta({
+      title: 'Admin Dashboard | Malawi Hidden Gems',
+      description: 'Administrative dashboard for managing featured gems and moderation.',
+      pathname: req.originalUrl,
+      image: '/images/logo.png',
+      noIndex: true,
+    }),
     posts: posts.map((post) => ({
       ...post,
       imageUrl: resolveImageUrl(post.imagePath),

@@ -1,60 +1,58 @@
 <%- include('partials/header') %>
 
-<section class="form-section">
-  <h2>Contact Us</h2>
-  <p>Have questions about Malawi Hidden Gems? Want to share feedback or partnership ideas? We'd love to hear from you.</p>
+<section class="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
+  <aside class="surface-panel p-8 md:p-10">
+    <p class="eyebrow">Contact</p>
+    <h1 class="mt-4 font-display text-5xl leading-none text-ink-900">Let’s talk tourism, partnerships, and platform ideas.</h1>
+    <p class="mt-6 text-base leading-8 text-ink-700">Reach out to the Malawi Hidden Gems team with editorial suggestions, destination partnerships, or product feedback.</p>
+    <div class="mt-8 space-y-5 text-sm leading-7 text-ink-700">
+      <div>
+        <h2 class="font-semibold text-ink-900">Email</h2>
+        <p>info@malawitourism.com</p>
+      </div>
+      <div>
+        <h2 class="font-semibold text-ink-900">Phone</h2>
+        <p>+265 885 040 112</p>
+      </div>
+      <div>
+        <h2 class="font-semibold text-ink-900">Location</h2>
+        <p>Tourism House, Lilongwe, Malawi</p>
+      </div>
+    </div>
+  </aside>
 
-  <% if (typeof error !== 'undefined') { %>
-    <div class="error-message">
-      <p><%= error %></p>
-    </div>
-  <% } %>
+  <section class="surface-panel p-8 md:p-10">
+    <% if (typeof error !== 'undefined') { %>
+      <div class="mb-6 rounded-[1.6rem] border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+        <%= error %>
+      </div>
+    <% } %>
 
-  <% if (typeof success !== 'undefined') { %>
-    <div class="success-message">
-      <p><%= success %></p>
-    </div>
-  <% } %>
+    <% if (typeof success !== 'undefined') { %>
+      <div class="mb-6 rounded-[1.6rem] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
+        <%= success %>
+      </div>
+    <% } %>
 
-  <form action="/contact" method="POST">
-    <div class="form-group">
-      <label for="name">Your Name</label>
-      <input type="text" id="name" name="name" value="<%= form.name %>" required>
-    </div>
-
-    <div class="form-group">
-      <label for="email">Email Address</label>
-      <input type="email" id="email" name="email" value="<%= form.email %>" required>
-    </div>
-
-    <div class="form-group">
-      <label for="message">Message</label>
-      <textarea id="message" name="message" rows="6" required><%= form.message %></textarea>
-    </div>
-
-    <div class="form-actions">
-      <button type="submit" class="btn primary">Send Message</button>
-      <a href="/posts" class="btn secondary">Cancel</a>
-    </div>
-  </form>
-</section>
-
-<section class="contact-info">
-  <h3>Other Ways to Reach Us</h3>
-  <div class="contact-methods">
-    <div class="contact-method">
-      <h4>Email</h4>
-      <p>info@malawitourism.com</p>
-    </div>
-    <div class="contact-method">
-      <h4>Phone</h4>
-      <p>+265 885 040 112</p>
-    </div>
-    <div class="contact-method">
-      <h4>Address</h4>
-      <p>Tourism House<br>Lilongwe, Malawi</p>
-    </div>
-  </div>
+    <form action="/contact" method="POST" class="grid gap-6">
+      <div>
+        <label for="name" class="mb-2 block text-sm font-semibold text-ink-900">Your name</label>
+        <input type="text" id="name" name="name" value="<%= form.name %>" required class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
+      </div>
+      <div>
+        <label for="email" class="mb-2 block text-sm font-semibold text-ink-900">Email address</label>
+        <input type="email" id="email" name="email" value="<%= form.email %>" required class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
+      </div>
+      <div>
+        <label for="message" class="mb-2 block text-sm font-semibold text-ink-900">Message</label>
+        <textarea id="message" name="message" rows="6" required class="min-h-[200px] w-full rounded-[1.6rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm leading-7 text-ink-900 outline-none focus:border-forest-300 focus:bg-white"><%= form.message %></textarea>
+      </div>
+      <div class="flex flex-col gap-3 pt-2 sm:flex-row">
+        <button type="submit" class="inline-flex items-center justify-center rounded-full bg-forest-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-forest-600/20 hover:bg-forest-700">Send message</button>
+        <a href="/posts" class="inline-flex items-center justify-center rounded-full border border-black/10 px-6 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Back to stories</a>
+      </div>
+    </form>
+  </section>
 </section>
 
 <%- include('partials/footer') %>

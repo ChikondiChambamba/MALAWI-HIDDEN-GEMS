@@ -1,14 +1,36 @@
-<nav>
-  <ul>
-    <li><a href="/">Home</a></li>
-    <li><a href="/posts">Explore</a></li>
-    <li><a href="/about">About</a></li>
-    <li><a href="/contact">Contact</a></li>
-    <li><a href="/create">Create Post</a></li>
-    <% if (isAdmin) { %>
-      <li><a href="/admin/dashboard">Admin</a></li>
-    <% } else { %>
-      <li><a href="/admin/login">Admin</a></li>
-    <% } %>
-  </ul>
+<nav class="relative z-10">
+  <div class="glass-panel px-3 py-3">
+    <ul class="flex flex-wrap items-center gap-2 text-sm font-semibold text-white/85">
+      <li>
+        <a href="/" class="<%= currentPath === '/' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
+          Home
+        </a>
+      </li>
+      <li>
+        <a href="/posts" class="<%= currentPath === '/posts' || currentPath === '/posts/search' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
+          Explore
+        </a>
+      </li>
+      <li>
+        <a href="/about" class="<%= currentPath === '/about' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
+          About
+        </a>
+      </li>
+      <li>
+        <a href="/contact" class="<%= currentPath === '/contact' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
+          Contact
+        </a>
+      </li>
+      <li>
+        <a href="/posts/new" class="<%= currentPath === '/create' || currentPath === '/posts/new' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
+          Share a Gem
+        </a>
+      </li>
+      <li class="ml-auto">
+        <a href="<%= isAdmin ? '/admin/dashboard' : '/admin/login' %>" class="inline-flex rounded-full border border-white/20 bg-black/10 px-4 py-2.5 hover:bg-white/15">
+          <%= isAdmin ? 'Dashboard' : 'Admin' %>
+        </a>
+      </li>
+    </ul>
+  </div>
 </nav>
