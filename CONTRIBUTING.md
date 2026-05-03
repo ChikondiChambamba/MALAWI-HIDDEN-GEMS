@@ -13,8 +13,7 @@
 4. Add your MySQL, Prisma `DATABASE_URL`, `SITE_URL`, session, admin password, and Cloudinary values.
 5. Create the database named in `DB_NAME`.
 6. Run `npm run init-db`.
-7. Run `npm run build:css`.
-8. Start the app with `npm run dev`.
+7. Start the app with `npm run dev`.
 
 ## Code Style Guide
 
@@ -24,7 +23,7 @@
 - Match the existing MVC structure and keep logic in the appropriate layer.
 - Prefer Prisma queries and schema updates over raw SQL for application code.
 - Sanitize and validate user input before saving it.
-- Keep the Tailwind design system clean, mobile-first, and accessibility-aware.
+- Keep the shared CSS clean, mobile-first, and accessibility-aware.
 
 ## Running Tests
 
@@ -32,12 +31,6 @@ Run the test suite with:
 
 ```bash
 npm test
-```
-
-To rebuild the stylesheet after template or design changes:
-
-```bash
-npm run build:css
 ```
 
 ## Pull Requests

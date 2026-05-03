@@ -1,4 +1,4 @@
-const VERSION = 'mhg-v1';
+const VERSION = 'mhg-v3';
 const SHELL_CACHE = `${VERSION}-shell`;
 const RUNTIME_CACHE = `${VERSION}-runtime`;
 const IMAGE_CACHE = `${VERSION}-images`;
@@ -7,7 +7,8 @@ const PRECACHE_URLS = [
   '/',
   '/offline.html',
   '/manifest.webmanifest',
-  '/css/tailwind.css',
+  '/css/style.css',
+  '/css/custom.css',
   '/js/script.js',
   '/images/logo.png',
   '/images/default.jpg',

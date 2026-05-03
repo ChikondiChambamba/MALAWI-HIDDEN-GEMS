@@ -1,6 +1,6 @@
 # Malawi Hidden Gems
 
-Malawi Hidden Gems is a production-oriented tourism discovery platform built with Express.js, EJS, Prisma ORM, MySQL, Tailwind CSS, and Cloudinary. The app is optimized for low-bandwidth environments with offline-ready caching, lightweight mapping, responsive media delivery, dynamic SEO metadata, and an Apple-inspired premium interface.
+Malawi Hidden Gems is a production-oriented tourism discovery platform built with Express.js, EJS, Prisma ORM, MySQL, shared CSS, and Cloudinary. The app is optimized for low-bandwidth environments with offline-ready caching, lightweight mapping, responsive media delivery, dynamic SEO metadata, and an Apple-inspired premium interface.
 
 ## Features
 
@@ -17,7 +17,7 @@ Malawi Hidden Gems is a production-oriented tourism discovery platform built wit
 - Progressive Web App manifest and service worker using a stale-while-revalidate strategy
 - Leaflet.js destination map with CartoDB Positron tiles and database-driven markers
 - Dynamic SEO tags, Open Graph previews, canonical URLs, and JSON-LD structured data
-- Tailwind-powered mobile-first interface with premium minimal design
+- Mobile-first interface with premium minimal design
 - Helmet-powered security headers with a tailored Content Security Policy
 - Password-protected admin dashboard with session-based authentication
 - Hidden Gem of the Week featuring with automatic expiry after 7 days
@@ -44,7 +44,7 @@ Malawi Hidden Gems is a production-oriented tourism discovery platform built wit
 
 ### Frontend
 
-- Tailwind CSS
+- Shared CSS
 - Vanilla JavaScript
 - Leaflet.js
 - Google Fonts
@@ -55,11 +55,9 @@ Malawi Hidden Gems is a production-oriented tourism discovery platform built wit
 - Supertest
 - Nodemon
 - Prisma CLI
-- Tailwind CLI
 
 ## Project Structure
 
-- `assets/`: Tailwind CSS source
 - `config/`: app, Prisma, uploads, Cloudinary, and environment configuration
 - `controllers/`: route handlers for pages, posts, contact, and admin flows
 - `middleware/`: reusable request middleware
@@ -100,9 +98,8 @@ CLOUDINARY_FOLDER=malawi-hidden-gems
 2. Create the MySQL database named in `DB_NAME`.
 3. Copy `.env.example` to `.env` and add your credentials.
 4. Run `npm run init-db` to generate Prisma Client, push the schema, and seed default tags.
-5. Run `npm run build:css` to compile the Tailwind stylesheet.
-6. Start the app with `npm run dev` or `npm start`.
-7. Run `npm test` to execute the Jest suite.
+5. Start the app with `npm run dev` or `npm start`.
+6. Run `npm test` to execute the Jest suite.
 
 ## Contributor Guide
 
