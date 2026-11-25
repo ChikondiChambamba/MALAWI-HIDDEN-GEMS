@@ -37,6 +37,21 @@ function optionalNumber(name, fallback) {
   return parsedValue;
 }
 
+// Hosts such as Railway and Render sit behind one reverse proxy. Trusting it lets
+// Express see the real client IP (rate limiting) and HTTPS (secure cookies).
+// Set TRUST_PROXY to a hop count, "true"/"false", or an Express trust value.
+function parseTrustProxy(value, nodeEnv) {
+  if (typeof value === 'undefined' || value === '') {
+    return nodeEnv === 'production' ? 1 : false;
+  }
+
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  if (/^\d+$/.test(value)) return Number(value);
+
+  return value;
+}
+
 function buildDatabaseUrl() {
   if (process.env.DATABASE_URL) {
     return process.env.DATABASE_URL;
@@ -54,6 +69,7 @@ function buildDatabaseUrl() {
 const env = {
   nodeEnv: process.env.NODE_ENV || 'development',
   port: optionalNumber('PORT', 3000),
+  trustProxy: parseTrustProxy(process.env.TRUST_PROXY, process.env.NODE_ENV || 'development'),
   dbHost: required('DB_HOST'),
   dbPort: optionalNumber('DB_PORT', 3306),
   dbUser: required('DB_USER'),

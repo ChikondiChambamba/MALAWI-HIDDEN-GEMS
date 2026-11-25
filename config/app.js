@@ -17,6 +17,8 @@ const { errorHandler } = require('../middleware/errorHandler');
 
 const app = express();
 
+app.set('trust proxy', env.trustProxy);
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '..', 'views'));
 
