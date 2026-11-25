@@ -1,0 +1,30 @@
+/* Error and offline pages. */
+
+.status-page {
+  max-width: 680px;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.status-page > * + * {
+  margin-top: 1.25rem;
+}
+
+.status-page .lede {
+  margin-inline: auto;
+}
+
+.status-page .btn-row {
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.status-sun {
+  width: 120px;
+  height: 60px;
+  margin-inline: auto;
+  border-radius: 120px 120px 0 0;
+  background:
+    radial-gradient(circle at 50% 100%, var(--red) 0 34%, transparent 35%),
+    repeating-conic-gradient(from -90deg at 50% 100%, var(--red) 0deg 6deg, transparent 6deg 15deg);
+}

@@ -1,0 +1,217 @@
+/* Form layout, inputs, file drop, tag chips and form actions. */
+
+.form-page {
+  max-width: 920px;
+  margin-inline: auto;
+}
+
+.form-intro > * + * {
+  margin-top: 1rem;
+}
+
+.form {
+  display: grid;
+  gap: 1.75rem;
+  margin-top: 2rem;
+}
+
+.form-grid {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.field {
+  display: grid;
+  gap: 0.5rem;
+  align-content: start;
+}
+
+.field__label {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+}
+
+.field__label small {
+  margin-left: 0.4rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--muted);
+}
+
+.field__hint {
+  font-size: 0.84rem;
+  color: var(--muted);
+}
+
+.input {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--paper);
+  font-size: 0.95rem;
+  transition: border-color 140ms, box-shadow 140ms, background-color 140ms;
+}
+
+.input::placeholder {
+  color: #9c9284;
+}
+
+.input:hover {
+  border-color: rgba(21, 18, 14, 0.4);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--green);
+  background: #fff;
+  box-shadow: 0 0 0 4px var(--green-soft);
+}
+
+textarea.input {
+  min-height: 12rem;
+  resize: vertical;
+  line-height: 1.75;
+}
+
+.file-drop {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.1rem;
+  border: 2px dashed var(--line-2);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+  transition: border-color 140ms, background-color 140ms;
+}
+
+.file-drop:hover,
+.file-drop:focus-within {
+  border-color: var(--green);
+  background: var(--green-soft);
+}
+
+.file-drop input[type="file"] {
+  font-size: 0.88rem;
+  color: var(--muted);
+}
+
+.file-drop input[type="file"]::file-selector-button {
+  margin-right: 0.9rem;
+  padding: 0.6rem 1rem;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius);
+  background: var(--ink);
+  color: #fffaf0;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.file-drop input[type="file"]::file-selector-button:hover {
+  background: var(--green);
+}
+
+.image-frame {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  aspect-ratio: 16 / 9;
+  background: var(--paper-2);
+}
+
+.image-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.image-frame figcaption {
+  display: none;
+}
+
+.chip-select {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.chip-select legend {
+  margin-bottom: 0.75rem;
+  padding: 0;
+}
+
+.chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.9rem;
+  border: 1.5px solid var(--line-2);
+  border-radius: var(--radius);
+  background: var(--paper);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 140ms, background-color 140ms, color 140ms;
+}
+
+.chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.chip::before {
+  content: "+";
+  font-weight: 800;
+  color: var(--green);
+}
+
+.chip:hover {
+  border-color: var(--green);
+}
+
+.chip:has(input:checked) {
+  border-color: var(--green-deep);
+  background: var(--green-deep);
+  color: #fffaf0;
+}
+
+.chip:has(input:checked)::before {
+  content: "\2713";
+  color: var(--sun);
+}
+
+.chip:has(input:focus-visible) {
+  outline: 3px solid var(--sun);
+  outline-offset: 2px;
+}
+
+.form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+.form-page--narrow {
+  max-width: 560px;
+}
+
+@media (min-width: 640px) {
+  .form-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+  .field--full {
+      grid-column: 1 / -1;
+    }
+}

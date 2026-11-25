@@ -1,0 +1,57 @@
+/* About page intro and numbered pillars. */
+
+.about-intro {
+  display: grid;
+  gap: clamp(1.5rem, 4vw, 3rem);
+}
+
+.about-intro__text > * + * {
+  margin-top: 1.1rem;
+}
+
+.pillars {
+  display: grid;
+  margin: clamp(2.5rem, 5vw, 4rem) 0 0;
+  padding: 0;
+  list-style: none;
+  border-top: 2px solid var(--ink);
+}
+
+.pillar {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1.75rem 0;
+  border-bottom: 1px solid var(--line-2);
+}
+
+.pillar__num {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1;
+  color: var(--clay);
+}
+
+.pillar p {
+  color: var(--ink-2);
+  line-height: 1.75;
+}
+
+@media (min-width: 640px) {
+  .pillars {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 0 2rem;
+    }
+
+  .pillar {
+      border-bottom: 0;
+    }
+}
+
+@media (min-width: 900px) {
+  .about-intro {
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+    }
+}

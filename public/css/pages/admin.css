@@ -1,0 +1,71 @@
+/* Admin dashboard rows. */
+
+.admin-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.admin-head__text > * + * {
+  margin-top: 1rem;
+}
+
+.admin-list {
+  display: grid;
+  gap: 1rem;
+  margin: 2rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-row {
+  display: grid;
+  overflow: hidden;
+}
+
+.admin-row.is-featured {
+  border-color: var(--sun);
+  box-shadow: 0 0 0 2px var(--sun), var(--shadow-soft);
+}
+
+.admin-row__media {
+  aspect-ratio: 16 / 10;
+  background: var(--paper-2);
+}
+
+.admin-row__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.admin-row__body {
+  display: grid;
+  gap: 0.8rem;
+  padding: 1.25rem 1.4rem;
+}
+
+.admin-row__title {
+  font-size: 1.6rem;
+}
+
+.admin-row__title a {
+  text-decoration: none;
+}
+
+.admin-row__title a:hover {
+  color: var(--green);
+}
+
+@media (min-width: 640px) {
+  .admin-row {
+      grid-template-columns: 220px 1fr;
+    }
+
+  .admin-row__media {
+      aspect-ratio: auto;
+      min-height: 100%;
+    }
+}

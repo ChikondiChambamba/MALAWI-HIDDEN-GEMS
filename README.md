@@ -43,7 +43,7 @@ Malawi Hidden Gems is a production-oriented tourism discovery platform built wit
 
 ### Frontend
 
-- Hand-written CSS in `public/css/style.css` (design tokens, no framework)
+- Hand-written CSS, no framework. `public/css/style.css` is the entry point and imports partials from `base/` (tokens, reset, type), `components/`, `layout/` (header, footer) and `pages/`
 - Vanilla JavaScript
 - Leaflet.js
 - Google Fonts

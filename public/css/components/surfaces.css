@@ -1,0 +1,80 @@
+/* Sheets (panels), notices, badges and empty states. */
+
+.sheet {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--card);
+  box-shadow: var(--shadow-soft);
+}
+
+.sheet--flagged {
+  overflow: hidden;
+}
+
+.sheet--flagged::before {
+  content: "";
+  display: block;
+  height: 6px;
+  background: var(--flag-bar);
+}
+
+.sheet__pad {
+  padding: clamp(1.4rem, 3.5vw, 2.5rem);
+}
+
+.sheet__head {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.notice {
+  padding: 0.9rem 1.1rem;
+  border: 1px solid;
+  border-left-width: 5px;
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.notice strong {
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.notice--error {
+  border-color: var(--red);
+  background: var(--red-soft);
+  color: #7d0a1c;
+}
+
+.notice--success {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green-deep);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: var(--sun);
+  color: var(--ink);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.empty-state {
+  padding: clamp(2.5rem, 6vw, 4rem) 1.5rem;
+  border: 2px dashed var(--line-2);
+  border-radius: var(--radius-lg);
+  text-align: center;
+}
+
+.empty-state .lede {
+  margin-inline: auto;
+}

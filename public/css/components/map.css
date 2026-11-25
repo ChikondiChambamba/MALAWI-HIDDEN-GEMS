@@ -1,0 +1,105 @@
+/* Map cards, directions panel and Leaflet popup overrides. */
+
+.map-card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.map-card__canvas {
+  flex: 1;
+  min-height: 300px;
+  background:
+    repeating-linear-gradient(45deg, var(--paper-2) 0 10px, var(--paper) 10px 20px);
+}
+
+.map-card__canvas--tall {
+  min-height: 360px;
+}
+
+.map-directions {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1.1rem 1.25rem 1.25rem;
+  border-top: 1px solid var(--line);
+}
+
+.map-directions__status {
+  min-height: 1.25rem;
+  font-size: 0.82rem;
+  color: var(--muted);
+}
+
+.leaflet-container {
+  font-family: var(--font-body);
+  background: var(--paper-2);
+}
+
+.gem-popup-shell .leaflet-popup-content-wrapper {
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-stamp);
+}
+
+.gem-popup-shell .leaflet-popup-content {
+  margin: 0.75rem;
+}
+
+.gem-popup {
+  width: 220px;
+}
+
+.gem-popup--compact {
+  width: auto;
+}
+
+.gem-popup p {
+  margin: 0;
+}
+
+.gem-popup__img {
+  width: 100%;
+  height: 120px;
+  margin-bottom: 0.6rem;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.gem-popup__title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.gem-popup__place {
+  margin-top: 0.15rem !important;
+  font-size: 0.8rem;
+  color: var(--green);
+}
+
+.gem-popup__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.gem-popup__tag {
+  padding: 0.15rem 0.45rem;
+  border-radius: 3px;
+  background: var(--green-soft);
+  color: var(--green-deep);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.gem-popup .gem-popup__link {
+  display: inline-block;
+  margin-top: 0.7rem;
+  color: var(--green);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: none;
+}

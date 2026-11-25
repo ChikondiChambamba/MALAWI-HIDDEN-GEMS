@@ -1,0 +1,88 @@
+/* Eyebrow labels, display headings, lede text, meta lists, spacing helpers. */
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--clay);
+}
+
+.eyebrow::before {
+  content: "";
+  width: 1.6rem;
+  height: 0.5rem;
+  border-radius: 1px;
+  background: var(--flag-bar);
+}
+
+.eyebrow--light {
+  color: var(--sun);
+}
+
+.display-xl { font-size: clamp(2.6rem, 6.4vw, 5.25rem); }
+
+.display-lg { font-size: clamp(2.2rem, 4.6vw, 3.6rem); }
+
+.display-md { font-size: clamp(1.7rem, 3vw, 2.3rem); }
+
+.display-xl em,
+.display-lg em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--green);
+}
+
+.lede {
+  max-width: 60ch;
+  font-size: clamp(1.02rem, 1.4vw, 1.15rem);
+  line-height: 1.75;
+  color: var(--ink-2);
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.gap-top-sm { margin-top: 0.6rem; }
+
+.gap-top-md { margin-top: 1rem; }
+
+.gap-top-lg { margin-top: 2rem; }
+
+.page-intro {
+  max-width: 760px;
+}
+
+.page-intro > * + * {
+  margin-top: 1rem;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+}
+
+.meta > li + li::before {
+  content: "";
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  margin: 0 0.65rem 0.15rem;
+  border-radius: 50%;
+  background: var(--sun);
+  vertical-align: middle;
+}

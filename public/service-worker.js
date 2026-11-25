@@ -1,14 +1,38 @@
-const VERSION = 'mhg-v6';
+const VERSION = 'mhg-v7';
 const SHELL_CACHE = `${VERSION}-shell`;
 const PAGE_CACHE = `${VERSION}-pages`;
 const ASSET_CACHE = `${VERSION}-assets`;
 const IMAGE_CACHE = `${VERSION}-images`;
 const ACTIVE_CACHES = [SHELL_CACHE, PAGE_CACHE, ASSET_CACHE, IMAGE_CACHE];
 
+// Partials imported by /css/style.css. Keep in sync with its @import list.
+const CSS_FILES = [
+  '/css/base/tokens.css',
+  '/css/base/base.css',
+  '/css/base/typography.css',
+  '/css/components/buttons.css',
+  '/css/components/tags.css',
+  '/css/components/surfaces.css',
+  '/css/components/section-head.css',
+  '/css/components/story-card.css',
+  '/css/components/pagination.css',
+  '/css/components/forms.css',
+  '/css/components/map.css',
+  '/css/layout/header.css',
+  '/css/layout/footer.css',
+  '/css/pages/home.css',
+  '/css/pages/story.css',
+  '/css/pages/about.css',
+  '/css/pages/contact.css',
+  '/css/pages/admin.css',
+  '/css/pages/status.css',
+];
+
 const PRECACHE_URLS = [
   '/offline.html',
   '/manifest.webmanifest',
   '/css/style.css',
+  ...CSS_FILES,
   '/js/script.js',
   '/images/logo.png',
   '/images/default.jpg',
