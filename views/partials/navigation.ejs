@@ -1,35 +1,26 @@
-<nav class="relative z-10">
-  <div class="glass-panel px-3 py-3">
-    <ul class="flex flex-wrap items-center gap-2 text-sm font-semibold text-white/85">
-      <li>
-        <a href="/" class="<%= currentPath === '/' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
-          Home
-        </a>
+<%
+  const navLinks = [
+    { href: '/', label: 'Home', active: currentPath === '/' },
+    { href: '/posts', label: 'Explore', active: currentPath === '/posts' || currentPath === '/posts/search' },
+    { href: '/about', label: 'About', active: currentPath === '/about' },
+    { href: '/contact', label: 'Contact', active: currentPath === '/contact' },
+  ];
+  const shareActive = currentPath === '/posts/new' || currentPath === '/create';
+  const adminActive = currentPath.startsWith('/admin');
+%>
+<nav class="site-nav" aria-label="Main">
+  <div class="container">
+    <ul class="site-nav__list">
+      <% navLinks.forEach((link) => { %>
+        <li>
+          <a href="<%= link.href %>" class="site-nav__link<%= link.active ? ' is-active' : '' %>"<%- link.active ? ' aria-current="page"' : '' %>><%= link.label %></a>
+        </li>
+      <% }) %>
+      <li class="site-nav__item--push">
+        <a href="/posts/new" class="site-nav__link site-nav__cta<%= shareActive ? ' is-active' : '' %>"<%- shareActive ? ' aria-current="page"' : '' %>>Share a gem</a>
       </li>
       <li>
-        <a href="/posts" class="<%= currentPath === '/posts' || currentPath === '/posts/search' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
-          Explore
-        </a>
-      </li>
-      <li>
-        <a href="/about" class="<%= currentPath === '/about' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
-          About
-        </a>
-      </li>
-      <li>
-        <a href="/contact" class="<%= currentPath === '/contact' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
-          Contact
-        </a>
-      </li>
-      <li>
-        <a href="/posts/new" class="<%= currentPath === '/create' || currentPath === '/posts/new' ? 'bg-white text-forest-700 shadow-sm' : 'hover:bg-white/15' %> inline-flex rounded-full px-4 py-2.5">
-          Share a Gem
-        </a>
-      </li>
-      <li class="ml-auto">
-        <a href="<%= isAdmin ? '/admin/dashboard' : '/admin/login' %>" class="inline-flex rounded-full border border-white/20 bg-black/10 px-4 py-2.5 hover:bg-white/15">
-          <%= isAdmin ? 'Dashboard' : 'Admin' %>
-        </a>
+        <a href="<%= isAdmin ? '/admin/dashboard' : '/admin/login' %>" class="site-nav__link site-nav__admin<%= adminActive ? ' is-active' : '' %>"><%= isAdmin ? 'Dashboard' : 'Admin' %></a>
       </li>
     </ul>
   </div>

@@ -202,7 +202,7 @@ async function showPost(req, res) {
     })],
     post: detailedPost,
     editorAccessGranted,
-    needsLeaflet: true,
+    needsLeaflet: typeof post.latitude === 'number' && typeof post.longitude === 'number',
   });
 }
 

@@ -1,0 +1,69 @@
+<%#
+  Shared by create.ejs and edit.ejs.
+  Expects: form, tags, action, submitLabel, cancelHref, and optionally currentImageUrl.
+%>
+<form action="<%= action %>" method="POST" enctype="multipart/form-data" class="form">
+  <div class="form-grid">
+    <div class="field field--full">
+      <label for="title" class="field__label">Story title</label>
+      <input type="text" id="title" name="title" value="<%= form.title %>" maxlength="255" required class="input">
+    </div>
+    <div class="field">
+      <label for="authorName" class="field__label">Your name <small>optional</small></label>
+      <input type="text" id="authorName" name="authorName" value="<%= form.authorName %>" maxlength="120" placeholder="Anonymous traveler" class="input">
+    </div>
+    <div class="field">
+      <label for="location" class="field__label">Location in Malawi</label>
+      <input type="text" id="location" name="location" value="<%= form.location %>" maxlength="120" placeholder="Cape Maclear, Mulanje, Zomba..." class="input">
+    </div>
+    <div class="field">
+      <label for="latitude" class="field__label">Latitude <small>optional</small></label>
+      <input type="number" step="any" min="-90" max="90" id="latitude" name="latitude" value="<%= form.latitude ?? '' %>" placeholder="-13.9626" class="input">
+    </div>
+    <div class="field">
+      <label for="longitude" class="field__label">Longitude <small>optional</small></label>
+      <input type="number" step="any" min="-180" max="180" id="longitude" name="longitude" value="<%= form.longitude ?? '' %>" placeholder="34.8389" class="input">
+    </div>
+    <p class="field__hint field--full">Add both coordinates to place your story on the map and give readers directions. Leave both blank to skip.</p>
+  </div>
+
+  <div class="field">
+    <label for="image" class="field__label">Destination image <small>JPG, PNG, GIF, WEBP or AVIF</small></label>
+    <% if (typeof currentImageUrl !== 'undefined' && currentImageUrl) { %>
+      <figure class="image-frame">
+        <img src="<%= currentImageUrl %>" alt="Current story image" loading="lazy">
+      </figure>
+    <% } %>
+    <div class="file-drop">
+      <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif,.webp,.avif,image/jpeg,image/png,image/gif,image/webp,image/avif">
+      <% if (typeof currentImageUrl !== 'undefined' && currentImageUrl) { %>
+        <p class="field__hint">Leave this empty to keep the current image.</p>
+      <% } %>
+    </div>
+    <figure class="image-frame" id="imagePreview" hidden>
+      <img src="" alt="Preview of the selected image" id="imagePreviewTag">
+    </figure>
+  </div>
+
+  <div class="field">
+    <label for="content" class="field__label">Your story</label>
+    <textarea id="content" name="content" rows="8" required class="input" placeholder="What makes this place special? How do you get there? What should people know before they go?"><%= form.content %></textarea>
+  </div>
+
+  <% if (tags.length) { %>
+    <fieldset class="chip-select">
+      <legend class="field__label">Tags</legend>
+      <% tags.forEach((tag) => { %>
+        <label class="chip">
+          <input type="checkbox" name="tagSlugs" value="<%= tag.slug %>" <%= form.tagSlugs.includes(tag.slug) ? 'checked' : '' %>>
+          <span><%= tag.name %></span>
+        </label>
+      <% }) %>
+    </fieldset>
+  <% } %>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn--primary"><%= submitLabel %> <span class="arrow" aria-hidden="true">&rarr;</span></button>
+    <a href="<%= cancelHref %>" class="btn btn--ghost">Cancel</a>
+  </div>
+</form>

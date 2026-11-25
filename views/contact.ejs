@@ -1,58 +1,61 @@
 <%- include('partials/header') %>
 
-<section class="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-  <aside class="surface-panel p-8 md:p-10">
-    <p class="eyebrow">Contact</p>
-    <h1 class="mt-4 font-display text-5xl leading-none text-ink-900">Let’s talk tourism, partnerships, and platform ideas.</h1>
-    <p class="mt-6 text-base leading-8 text-ink-700">Reach out to the Malawi Hidden Gems team with editorial suggestions, destination partnerships, or product feedback.</p>
-    <div class="mt-8 space-y-5 text-sm leading-7 text-ink-700">
+<div class="contact-layout">
+  <aside class="contact-card">
+    <p class="eyebrow eyebrow--light">Contact</p>
+    <h1 class="display-lg">Let's talk about tourism, partnerships and ideas.</h1>
+    <p class="lede">Send the team editorial suggestions, destination partnerships or feedback on the site.</p>
+    <dl class="contact-list">
       <div>
-        <h2 class="font-semibold text-ink-900">Email</h2>
-        <p>info@malawitourism.com</p>
+        <dt>Email</dt>
+        <dd><a href="mailto:info@malawitourism.com">info@malawitourism.com</a></dd>
       </div>
       <div>
-        <h2 class="font-semibold text-ink-900">Phone</h2>
-        <p>+265 885 040 112</p>
+        <dt>Phone</dt>
+        <dd><a href="tel:+265885040112">+265 885 040 112</a></dd>
       </div>
       <div>
-        <h2 class="font-semibold text-ink-900">Location</h2>
-        <p>Tourism House, Lilongwe, Malawi</p>
+        <dt>Office</dt>
+        <dd>Tourism House, Lilongwe, Malawi</dd>
       </div>
-    </div>
+    </dl>
   </aside>
 
-  <section class="surface-panel p-8 md:p-10">
-    <% if (typeof error !== 'undefined') { %>
-      <div class="mb-6 rounded-[1.6rem] border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
-        <%= error %>
-      </div>
-    <% } %>
+  <section class="sheet sheet--flagged" aria-labelledby="contact-form-title">
+    <div class="sheet__pad">
+      <p class="eyebrow">Send a message</p>
+      <h2 id="contact-form-title" class="display-md gap-top-sm">We usually reply within two working days.</h2>
 
-    <% if (typeof success !== 'undefined') { %>
-      <div class="mb-6 rounded-[1.6rem] border border-emerald-200 bg-emerald-50 px-5 py-4 text-sm text-emerald-800">
-        <%= success %>
-      </div>
-    <% } %>
+      <% if (typeof error !== 'undefined') { %>
+        <div class="notice notice--error gap-top-lg" role="alert"><%= error %></div>
+      <% } %>
 
-    <form action="/contact" method="POST" class="grid gap-6">
-      <div>
-        <label for="name" class="mb-2 block text-sm font-semibold text-ink-900">Your name</label>
-        <input type="text" id="name" name="name" value="<%= form.name %>" required class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
-      </div>
-      <div>
-        <label for="email" class="mb-2 block text-sm font-semibold text-ink-900">Email address</label>
-        <input type="email" id="email" name="email" value="<%= form.email %>" required class="w-full rounded-[1.4rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm text-ink-900 outline-none focus:border-forest-300 focus:bg-white">
-      </div>
-      <div>
-        <label for="message" class="mb-2 block text-sm font-semibold text-ink-900">Message</label>
-        <textarea id="message" name="message" rows="6" required class="min-h-[200px] w-full rounded-[1.6rem] border border-black/10 bg-sand-50 px-5 py-4 text-sm leading-7 text-ink-900 outline-none focus:border-forest-300 focus:bg-white"><%= form.message %></textarea>
-      </div>
-      <div class="flex flex-col gap-3 pt-2 sm:flex-row">
-        <button type="submit" class="inline-flex items-center justify-center rounded-full bg-forest-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-forest-600/20 hover:bg-forest-700">Send message</button>
-        <a href="/posts" class="inline-flex items-center justify-center rounded-full border border-black/10 px-6 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Back to stories</a>
-      </div>
-    </form>
+      <% if (typeof success !== 'undefined') { %>
+        <div class="notice notice--success gap-top-lg" role="status"><%= success %></div>
+      <% } %>
+
+      <form action="/contact" method="POST" class="form">
+        <div class="form-grid">
+          <div class="field">
+            <label for="name" class="field__label">Your name</label>
+            <input type="text" id="name" name="name" value="<%= form.name %>" maxlength="120" autocomplete="name" required class="input">
+          </div>
+          <div class="field">
+            <label for="email" class="field__label">Email address</label>
+            <input type="email" id="email" name="email" value="<%= form.email %>" maxlength="255" autocomplete="email" required class="input">
+          </div>
+          <div class="field field--full">
+            <label for="message" class="field__label">Message</label>
+            <textarea id="message" name="message" rows="6" maxlength="4000" required class="input"><%= form.message %></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn--primary">Send message <span class="arrow" aria-hidden="true">&rarr;</span></button>
+          <a href="/posts" class="btn btn--ghost">Back to stories</a>
+        </div>
+      </form>
+    </div>
   </section>
-</section>
+</div>
 
 <%- include('partials/footer') %>

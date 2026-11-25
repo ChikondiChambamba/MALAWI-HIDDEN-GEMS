@@ -4,11 +4,7 @@ function adminAuth(req, res, next) {
     return;
   }
 
-  res.status(403).render('admin-login', {
-    title: 'Admin Login - Malawi Hidden Gems',
-    pageDescription: 'Administrator login for Malawi Hidden Gems.',
-    error: 'Admin login is required to access the dashboard.',
-  });
+  res.redirect('/admin/login');
 }
 
 module.exports = {

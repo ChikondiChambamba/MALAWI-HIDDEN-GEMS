@@ -22,6 +22,7 @@ app.set('views', path.join(__dirname, '..', 'views'));
 
 app.locals.siteName = 'Malawi Hidden Gems';
 app.locals.siteUrl = env.siteUrl;
+app.locals.currentYear = new Date().getFullYear();
 
 app.use(helmet({
   contentSecurityPolicy: {
@@ -29,7 +30,7 @@ app.use(helmet({
       defaultSrc: ["'self'"],
       scriptSrc: ["'self'", 'unpkg.com'],
       styleSrc: ["'self'", 'fonts.googleapis.com', 'unpkg.com'],
-      imgSrc: ["'self'", 'data:', 'https://res.cloudinary.com', 'https://*.basemaps.cartocdn.com', 'unpkg.com'],
+      imgSrc: ["'self'", 'data:', 'blob:', 'https://res.cloudinary.com', 'https://tile.openstreetmap.org', 'unpkg.com'],
       fontSrc: ["'self'", 'fonts.gstatic.com'],
       connectSrc: ["'self'"],
       workerSrc: ["'self'"],
@@ -65,6 +66,7 @@ app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   res.locals.isAdmin = Boolean(req.session && req.session.isAdmin);
   res.locals.currentUrl = `${env.siteUrl}${req.originalUrl}`;
+  res.locals.navSearchQuery = typeof req.query.q === 'string' ? req.query.q : '';
   res.locals.seo = null;
   res.locals.structuredData = [];
   res.locals.needsLeaflet = false;

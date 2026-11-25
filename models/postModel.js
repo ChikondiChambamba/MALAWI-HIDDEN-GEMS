@@ -1,6 +1,7 @@
 const crypto = require('crypto');
 
 const { prisma } = require('../config/prisma');
+const { decodeEntities } = require('../utils/text');
 
 const POSTS_INCLUDE = {
   postTags: {
@@ -13,7 +14,7 @@ const POSTS_INCLUDE = {
 function mapTag(tag) {
   return {
     id: tag.id,
-    name: tag.name,
+    name: decodeEntities(tag.name),
     slug: tag.slug,
   };
 }
@@ -29,9 +30,9 @@ function mapPost(post) {
 
   return {
     id: post.id,
-    title: post.title,
-    authorName: post.authorName,
-    location: post.location,
+    title: decodeEntities(post.title),
+    authorName: decodeEntities(post.authorName),
+    location: post.location ? decodeEntities(post.location) : post.location,
     latitude: post.latitude,
     longitude: post.longitude,
     imagePath: post.imagePath,

@@ -9,15 +9,46 @@ function escapeHtml(value = '') {
     .replace(/'/g, '&#39;');
 }
 
+const NAMED_ENTITIES = {
+  amp: '&',
+  lt: '<',
+  gt: '>',
+  quot: '"',
+  apos: "'",
+  nbsp: ' ',
+};
+
+// sanitize-html HTML-encodes text output. Plain-text fields are escaped again by
+// EJS on render, so decode here to avoid users seeing "&amp;" in titles.
+function decodeEntities(value = '') {
+  if (typeof value !== 'string' || !value.includes('&')) {
+    return value;
+  }
+
+  return value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+    if (entity[0] === '#') {
+      const codePoint = entity[1].toLowerCase() === 'x'
+        ? Number.parseInt(entity.slice(2), 16)
+        : Number.parseInt(entity.slice(1), 10);
+
+      return Number.isFinite(codePoint) && codePoint > 0 && codePoint <= 0x10ffff
+        ? String.fromCodePoint(codePoint)
+        : match;
+    }
+
+    return NAMED_ENTITIES[entity.toLowerCase()] ?? match;
+  });
+}
+
 function sanitizePlainText(value, maxLength = 255) {
   if (typeof value !== 'string') {
     return '';
   }
 
-  return sanitizeHtml(value, {
+  return decodeEntities(sanitizeHtml(value, {
     allowedTags: [],
     allowedAttributes: {},
-  }).replace(/\s+/g, ' ').trim().slice(0, maxLength);
+  })).replace(/\s+/g, ' ').trim().slice(0, maxLength);
 }
 
 function sanitizeRichText(value, maxLength = 20000) {
@@ -41,10 +72,10 @@ function sanitizeRichText(value, maxLength = 20000) {
 }
 
 function stripMarkup(value = '') {
-  return sanitizeHtml(value, {
+  return decodeEntities(sanitizeHtml(value, {
     allowedTags: [],
     allowedAttributes: {},
-  });
+  }));
 }
 
 function slugify(value = '') {
@@ -55,6 +86,7 @@ function slugify(value = '') {
 }
 
 module.exports = {
+  decodeEntities,
   escapeHtml,
   sanitizePlainText,
   sanitizeRichText,

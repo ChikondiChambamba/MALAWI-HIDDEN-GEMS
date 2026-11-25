@@ -1,101 +1,116 @@
 <%- include('partials/header') %>
+<% const hasMapCoordinates = typeof post.latitude === 'number' && typeof post.longitude === 'number'; %>
+<% const hasCustomImage = post.imagePath && post.imagePath !== 'default.jpg'; %>
 
-<article class="grid gap-8 lg:grid-cols-[1.1fr_0.55fr]">
-  <div class="surface-panel overflow-hidden">
+<div class="story-layout">
+  <article class="sheet story">
     <% if (editorAccessGranted) { %>
-      <div class="border-b border-emerald-100 bg-emerald-50/80 px-6 py-5 text-sm text-emerald-800 md:px-8">
-        <strong class="block font-semibold">Editing access was saved securely in this browser.</strong>
-        <p class="mt-2 leading-7">You can return later from this device to edit or delete this story without exposing the editor token to client-side scripts.</p>
+      <div class="notice notice--success">
+        <strong>Your story is live. Editing access is saved in this browser.</strong>
+        Come back from this device any time to edit or delete it. Clearing your cookies removes that access.
       </div>
     <% } %>
 
-    <% if (post.imagePath && post.imagePath !== 'default.jpg') { %>
-      <div class="relative h-[320px] md:h-[440px]">
-        <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="absolute inset-0 h-full w-full object-cover" fetchpriority="high">
-        <div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent"></div>
-      </div>
+    <% if (hasCustomImage) { %>
+      <figure class="story__hero">
+        <img src="<%= post.imageUrl %>" alt="<%= post.title %>" fetchpriority="high">
+      </figure>
     <% } %>
 
-    <div class="px-6 py-8 md:px-10 md:py-10">
+    <header class="story__header">
       <p class="eyebrow">Destination story</p>
-      <h1 class="mt-4 font-display text-5xl leading-none text-ink-900 md:text-6xl"><%= post.title %></h1>
-      <div class="mt-5 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-forest-500">
-        <span><%= post.authorName %></span>
-        <% if (post.location) { %><span><%= post.location %></span><% } %>
-        <span><%= post.readTime %></span>
-        <span>Updated <%= new Date(post.updatedAt).toDateString() %></span>
-      </div>
-
+      <h1 class="display-xl"><%= post.title %></h1>
+      <ul class="meta">
+        <li><%= post.authorName %></li>
+        <% if (post.location) { %><li><%= post.location %></li><% } %>
+        <li><%= post.readTime %></li>
+      </ul>
       <% if (post.tags.length) { %>
-        <div class="mt-6 flex flex-wrap gap-2">
+        <ul class="tag-list">
           <% post.tags.forEach((tag) => { %>
-            <a href="/posts?tag=<%= tag.slug %>" class="rounded-full bg-sand-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-forest-700 hover:bg-sand-200"><%= tag.name %></a>
+            <li><a href="/posts?tag=<%= encodeURIComponent(tag.slug) %>" class="tag tag--lg"><%= tag.name %></a></li>
           <% }) %>
-        </div>
+        </ul>
       <% } %>
+    </header>
 
-      <div class="destination-body mt-8">
-        <%- post.formattedContent %>
-      </div>
+    <div class="prose">
+      <%- post.formattedContent %>
     </div>
-  </div>
+  </article>
 
-  <aside class="space-y-6">
-    <section class="glass-panel p-6">
-      <p class="eyebrow">About this story</p>
-      <dl class="mt-5 space-y-4 text-sm leading-7 text-ink-700">
-        <div>
-          <dt class="font-semibold text-ink-900">Published</dt>
-          <dd><%= new Date(post.createdAt).toDateString() %></dd>
-        </div>
-        <div>
-          <dt class="font-semibold text-ink-900">Contributor</dt>
-          <dd><%= post.authorName %></dd>
-        </div>
-        <% if (post.location) { %>
+  <aside class="story-aside">
+    <section class="sheet sheet--flagged">
+      <div class="sheet__pad">
+        <p class="eyebrow">About this story</p>
+        <dl class="facts">
           <div>
-            <dt class="font-semibold text-ink-900">Location</dt>
-            <dd><%= post.location %></dd>
+            <dt>Published</dt>
+            <dd><time datetime="<%= new Date(post.createdAt).toISOString() %>"><%= new Date(post.createdAt).toDateString() %></time></dd>
           </div>
-        <% } %>
-        <div>
-          <dt class="font-semibold text-ink-900">Reading time</dt>
-          <dd><%= post.readTime %></dd>
-        </div>
-      </dl>
+          <div>
+            <dt>Updated</dt>
+            <dd><time datetime="<%= new Date(post.updatedAt).toISOString() %>"><%= new Date(post.updatedAt).toDateString() %></time></dd>
+          </div>
+          <div>
+            <dt>Contributor</dt>
+            <dd><%= post.authorName %></dd>
+          </div>
+          <% if (post.location) { %>
+            <div>
+              <dt>Location</dt>
+              <dd><%= post.location %></dd>
+            </div>
+          <% } %>
+          <div>
+            <dt>Reading time</dt>
+            <dd><%= post.readTime %></dd>
+          </div>
+        </dl>
+      </div>
     </section>
 
-    <section data-map-shell class="surface-panel overflow-hidden">
-      <div class="border-b border-black/5 px-6 py-5">
-        <p class="eyebrow">Location preview</p>
-        <h2 class="mt-2 font-display text-3xl text-ink-900">See where this gem lives.</h2>
-      </div>
-      <div class="h-[280px]">
+    <% if (hasMapCoordinates) { %>
+      <section data-map-shell class="sheet map-card" aria-labelledby="map-title">
+        <div class="sheet__head">
+          <p class="eyebrow">Map and directions</p>
+          <h2 id="map-title" class="display-md gap-top-sm">Find your way to this gem.</h2>
+        </div>
         <div
-          class="h-full w-full"
+          class="map-card__canvas"
           data-map-mode="single"
-          data-latitude="<%= typeof post.latitude === 'number' ? post.latitude : '' %>"
-          data-longitude="<%= typeof post.longitude === 'number' ? post.longitude : '' %>"
+          data-latitude="<%= post.latitude %>"
+          data-longitude="<%= post.longitude %>"
           data-title="<%= post.title %>"
           data-location="<%= post.location || 'Malawi' %>"
+          role="region"
+          aria-label="Map showing <%= post.title %>"
         ></div>
-      </div>
-    </section>
-
-    <section class="surface-panel p-6">
-      <div class="flex flex-col gap-3">
-        <a href="/posts" class="inline-flex items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Back to all experiences</a>
-        <% if (post.canEdit) { %>
-        <div class="editor-controls flex-col gap-3" data-post-id="<%= post.id %>">
-          <a href="/posts/<%= post.id %>/edit" class="editor-edit-link inline-flex items-center justify-center rounded-full bg-forest-600 px-5 py-3 text-sm font-semibold text-white hover:bg-forest-700">Edit this experience</a>
-          <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form editor-delete-form" data-post-id="<%= post.id %>">
-            <button type="submit" class="w-full rounded-full border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100">Delete experience</button>
-          </form>
+        <div class="map-directions" data-directions data-latitude="<%= post.latitude %>" data-longitude="<%= post.longitude %>">
+          <a
+            class="btn btn--ghost"
+            href="https://www.openstreetmap.org/?mlat=<%= post.latitude %>&mlon=<%= post.longitude %>#map=13/<%= post.latitude %>/<%= post.longitude %>"
+            target="_blank"
+            rel="noopener noreferrer"
+          >Open in OpenStreetMap</a>
+          <button type="button" class="btn btn--primary" data-directions-button>Directions from my location</button>
+          <p class="map-directions__status" data-directions-status aria-live="polite"></p>
         </div>
+      </section>
+    <% } %>
+
+    <section class="sheet">
+      <div class="sheet__pad btn-row">
+        <a href="/posts" class="btn btn--ghost btn--block"><span aria-hidden="true">&larr;</span> All experiences</a>
+        <% if (post.canEdit) { %>
+          <a href="/posts/<%= post.id %>/edit" class="btn btn--primary btn--block">Edit this story</a>
+          <form action="/posts/<%= post.id %>?_method=DELETE" method="POST" class="delete-form">
+            <button type="submit" class="btn btn--danger btn--block">Delete story</button>
+          </form>
         <% } %>
       </div>
     </section>
   </aside>
-</article>
+</div>
 
 <%- include('partials/footer') %>

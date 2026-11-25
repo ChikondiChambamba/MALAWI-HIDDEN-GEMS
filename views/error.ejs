@@ -1,14 +1,13 @@
 <%- include('partials/header') %>
 
-<section class="mx-auto max-w-3xl">
-  <div class="surface-panel px-8 py-14 text-center md:px-12">
-    <p class="eyebrow">Something happened</p>
-    <h1 class="mt-4 font-display text-5xl text-ink-900"><%= title || 'Application error' %></h1>
-    <p class="mx-auto mt-5 max-w-2xl text-base leading-8 text-ink-700"><%= message %></p>
-    <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-      <a href="/" class="inline-flex items-center justify-center rounded-full bg-forest-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-forest-600/20 hover:bg-forest-700">Go home</a>
-      <a href="/posts" class="inline-flex items-center justify-center rounded-full border border-black/10 px-6 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Browse posts</a>
-    </div>
+<section class="status-page">
+  <div class="status-sun" aria-hidden="true"></div>
+  <p class="eyebrow">Something went wrong</p>
+  <h1 class="display-lg"><%= title || 'Application error' %></h1>
+  <p class="lede"><%= message %></p>
+  <div class="btn-row">
+    <a href="/" class="btn btn--primary">Go home</a>
+    <a href="/posts" class="btn btn--ghost">Browse stories</a>
   </div>
 </section>
 

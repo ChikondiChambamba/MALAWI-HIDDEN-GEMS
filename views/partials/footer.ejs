@@ -1,20 +1,22 @@
   </main>
-  <footer class="border-t border-black/5 bg-white/70">
-    <div class="mx-auto flex max-w-7xl flex-col gap-8 px-6 py-10 lg:flex-row lg:items-end lg:justify-between lg:px-8">
-      <div class="max-w-xl">
-        <p class="eyebrow">Malawi Hidden Gems</p>
-        <h2 class="mt-3 font-display text-3xl text-ink-900">Beautiful tourism discovery that still works when the network does not.</h2>
-        <p class="mt-4 text-sm leading-7 text-ink-700">Progressive enhancement, offline caching, responsive media delivery, and premium editorial design for discovering Malawi with less friction.</p>
-      </div>
-      <div class="flex flex-col gap-3 text-sm font-medium text-ink-700">
-        <a href="/posts" class="hover:text-forest-600">Explore destinations</a>
-        <a href="/posts/new" class="hover:text-forest-600">Share a hidden gem</a>
-        <a href="/contact" class="hover:text-forest-600">Contact the team</a>
-        <a href="/admin/login" class="hover:text-forest-600">Admin access</a>
+  <footer class="site-footer">
+    <div class="container">
+      <div class="site-footer__grid">
+        <div>
+          <p class="eyebrow eyebrow--light"><%= siteName %></p>
+          <h2 class="site-footer__title">Lakes, peaks and plateaus, told by the people who found them.</h2>
+        </div>
+        <ul class="site-footer__links">
+          <li><a href="/posts">Explore destinations</a></li>
+          <li><a href="/posts/new">Share a hidden gem</a></li>
+          <li><a href="/about">About the project</a></li>
+          <li><a href="/contact">Contact the team</a></li>
+          <li><a href="<%= isAdmin ? '/admin/dashboard' : '/admin/login' %>"><%= isAdmin ? 'Admin dashboard' : 'Admin access' %></a></li>
+        </ul>
       </div>
     </div>
-    <div class="border-t border-black/5 px-6 py-4 text-center text-xs tracking-[0.18em] text-ink-700 uppercase">
-      &copy; 2026 Malawi Hidden Gems
+    <div class="site-footer__base">
+      <div class="container">&copy; <%= currentYear %> <%= siteName %></div>
     </div>
   </footer>
   <% if (needsLeaflet) { %>

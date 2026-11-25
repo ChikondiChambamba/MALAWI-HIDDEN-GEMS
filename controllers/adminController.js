@@ -57,6 +57,7 @@ function redirectDashboard(req, res) {
 
 async function dashboard(req, res) {
   const posts = await Post.getAllPosts();
+  const now = Date.now();
 
   res.render('admin-dashboard', {
     title: 'Admin Dashboard | Malawi Hidden Gems',
@@ -73,6 +74,7 @@ async function dashboard(req, res) {
       imageUrl: resolveImageUrl(post.imagePath),
       excerpt: buildExcerpt(post.content, 110),
       readTime: calculateReadTime(post.content),
+      isCurrentlyFeatured: Boolean(post.featured && post.featuredUntil && new Date(post.featuredUntil).getTime() > now),
     })),
   });
 }

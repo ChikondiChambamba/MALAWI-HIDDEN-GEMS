@@ -45,17 +45,19 @@ async function uploadImageIfProvided(file) {
 }
 
 async function removeImageIfManagedUpload(publicId) {
-  if (!publicId) {
+  if (!publicId || !env.hasCloudinaryConfig) {
     return;
   }
 
+  // Image cleanup is best effort: the post itself has already been saved or
+  // removed, so a Cloudinary hiccup must not turn into a 500 for the user.
   try {
     await cloudinary.uploader.destroy(publicId, {
       invalidate: true,
       resource_type: 'image',
     });
   } catch (error) {
-    throw error;
+    console.warn(`Could not remove Cloudinary image ${publicId}:`, error.message);
   }
 }
 

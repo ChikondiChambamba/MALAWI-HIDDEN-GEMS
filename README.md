@@ -1,6 +1,6 @@
 # Malawi Hidden Gems
 
-Malawi Hidden Gems is a production-oriented tourism discovery platform built with Express.js, EJS, Prisma ORM, MySQL, shared CSS, and Cloudinary. The app is optimized for low-bandwidth environments with offline-ready caching, lightweight mapping, responsive media delivery, dynamic SEO metadata, and an Apple-inspired premium interface.
+Malawi Hidden Gems is a production-oriented tourism discovery platform built with Express.js, EJS, Prisma ORM, MySQL, hand-written CSS (no CSS framework), and Cloudinary. The app is optimized for low-bandwidth environments with offline-ready caching, lightweight mapping, responsive media delivery, dynamic SEO metadata, and a custom interface inspired by the Malawi flag.
 
 ## Features
 
@@ -14,8 +14,8 @@ Malawi Hidden Gems is a production-oriented tourism discovery platform built wit
 - Region and experience tags with tag-based filtering
 - Pagination that works with search queries and tag filters
 - Post excerpts and estimated read time on listing pages
-- Progressive Web App manifest and service worker using a stale-while-revalidate strategy
-- Leaflet.js destination map with CartoDB Positron tiles and database-driven markers
+- Progressive Web App manifest and service worker (network-first pages with offline fallback, stale-while-revalidate for images and assets)
+- Leaflet.js destination map with OpenStreetMap tiles, database-driven markers, and directions from the visitor's location
 - Dynamic SEO tags, Open Graph previews, canonical URLs, and JSON-LD structured data
 - Mobile-first interface with premium minimal design
 - Helmet-powered security headers with a tailored Content Security Policy
@@ -39,12 +39,11 @@ Malawi Hidden Gems is a production-oriented tourism discovery platform built wit
 - sanitize-html
 - helmet
 - cloudinary
-- multer-storage-cloudinary
 - sharp
 
 ### Frontend
 
-- Shared CSS
+- Hand-written CSS in `public/css/style.css` (design tokens, no framework)
 - Vanilla JavaScript
 - Leaflet.js
 - Google Fonts

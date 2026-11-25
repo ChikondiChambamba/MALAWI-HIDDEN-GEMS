@@ -143,6 +143,21 @@ describe('Malawi Hidden Gems routes', () => {
     expect(response.text).toContain('1 result found for &#34;lake&#34;');
   });
 
+  test('GET /posts/:id shows OpenStreetMap directions when coordinates exist', async () => {
+    Post.getPostById.mockResolvedValue(buildPost({
+      latitude: -13.9626,
+      longitude: 34.8389,
+    }));
+
+    const response = await request(app).get('/posts/1');
+
+    expect(response.status).toBe(200);
+    expect(response.text).toContain('Map and directions');
+    expect(response.text).toContain('Open in OpenStreetMap');
+    expect(response.text).toContain('Directions from my location');
+    expect(response.text).toContain('https://www.openstreetmap.org/?mlat=-13.9626');
+  });
+
   test('PUT /posts/:id fails without token and succeeds with the correct token', async () => {
     Post.validateEditorToken.mockResolvedValue(false);
 
@@ -207,6 +222,46 @@ describe('Malawi Hidden Gems routes', () => {
       id: 1,
       success: true,
     });
+  });
+
+  test('POST /posts stores plain text without HTML entities so it is escaped only once on render', async () => {
+    Post.createPost.mockResolvedValue({ id: 7, editorToken: 'token-7' });
+
+    await request(app)
+      .post('/posts')
+      .set('Accept', 'application/json')
+      .type('form')
+      .send({
+        title: 'Fish & Chips <b>by</b> the Lake',
+        content: 'Great food.',
+      });
+
+    expect(Post.createPost).toHaveBeenCalledWith(expect.objectContaining({
+      title: 'Fish & Chips by the Lake',
+    }));
+
+    Post.getPostById.mockResolvedValue(buildPost({ title: 'Fish & Chips by the Lake' }));
+    const response = await request(app).get('/posts/1');
+
+    expect(response.text).toContain('Fish &amp; Chips by the Lake');
+    expect(response.text).not.toContain('&amp;amp;');
+  });
+
+  test('GET /posts/:id skips the map and Leaflet when the post has no coordinates', async () => {
+    Post.getPostById.mockResolvedValue(buildPost({ latitude: null, longitude: null }));
+
+    const response = await request(app).get('/posts/1');
+
+    expect(response.status).toBe(200);
+    expect(response.text).not.toContain('Map and directions');
+    expect(response.text).not.toContain('leaflet.js');
+  });
+
+  test('GET /admin/dashboard redirects anonymous visitors to the login page', async () => {
+    const response = await request(app).get('/admin/dashboard');
+
+    expect(response.status).toBe(302);
+    expect(response.headers.location).toBe('/admin/login');
   });
 
   test('POST /admin/login fails with wrong password and succeeds with the correct password', async () => {

@@ -1,4 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const BRAND = {
+    green: '#1f6b3f',
+    greenSoft: '#4f9a6c',
+    red: '#c8102e',
+    sun: '#f2b632',
+  };
+
+  function escapeHtml(value) {
+    return String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function hideMapShell(element) {
+    const shell = element.closest('[data-map-shell]');
+
+    if (shell) {
+      shell.hidden = true;
+    }
+  }
+
   function registerServiceWorker() {
     if (!('serviceWorker' in navigator)) {
       return;
@@ -12,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function wireDeleteConfirmation() {
     document.querySelectorAll('.delete-form').forEach((form) => {
       form.addEventListener('submit', (event) => {
-        if (!window.confirm('Are you sure you want to delete this post?')) {
+        if (!window.confirm('Are you sure you want to delete this story? This cannot be undone.')) {
           event.preventDefault();
         }
       });
@@ -35,6 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const imageInput = document.getElementById('image');
     const imagePreview = document.getElementById('imagePreview');
     const imagePreviewTag = document.getElementById('imagePreviewTag');
+    const fileName = document.querySelector('[data-file-name]');
+    let currentObjectUrl = null;
 
     if (!imageInput || !imagePreview || !imagePreviewTag) {
       return;
@@ -43,16 +69,22 @@ document.addEventListener('DOMContentLoaded', () => {
     imageInput.addEventListener('change', (event) => {
       const [file] = event.target.files;
 
+      if (currentObjectUrl) {
+        URL.revokeObjectURL(currentObjectUrl);
+        currentObjectUrl = null;
+      }
+
       if (!file) {
-        imagePreview.setAttribute('aria-hidden', 'true');
-        imagePreviewTag.classList.add('hidden');
+        imagePreview.hidden = true;
         imagePreviewTag.removeAttribute('src');
+        if (fileName) fileName.textContent = 'No file chosen';
         return;
       }
 
-      imagePreviewTag.src = URL.createObjectURL(file);
-      imagePreviewTag.classList.remove('hidden');
-      imagePreview.setAttribute('aria-hidden', 'false');
+      currentObjectUrl = URL.createObjectURL(file);
+      imagePreviewTag.src = currentObjectUrl;
+      imagePreview.hidden = false;
+      if (fileName) fileName.textContent = file.name;
     });
   }
 
@@ -65,26 +97,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function buildTileLayer(L) {
-    return L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-      attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-      subdomains: 'abcd',
+    return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
       maxZoom: 18,
     });
   }
 
+  // All values are escaped: titles, places and tags are user-submitted.
   function buildPopup(destination) {
     const tagMarkup = (destination.tags || [])
       .slice(0, 3)
-      .map((tag) => `<span style="display:inline-block;margin:4px 6px 0 0;padding:4px 8px;border-radius:999px;background:#edf4ef;color:#305542;font-size:11px;">${tag.name}</span>`)
+      .map((tag) => `<span class="gem-popup__tag">${escapeHtml(tag.name)}</span>`)
       .join('');
 
     return `
-      <div style="width:220px;font-family:Manrope,sans-serif;">
-        <img src="${destination.imageUrl}" alt="${destination.title}" style="width:100%;height:120px;object-fit:cover;border-radius:14px;margin-bottom:10px;" loading="lazy">
-        <div style="font-size:15px;font-weight:700;color:#182128;">${destination.title}</div>
-        <div style="margin-top:4px;color:#416f58;font-size:13px;">${destination.location || 'Malawi'}</div>
-        <div style="margin-top:6px;">${tagMarkup}</div>
-        <a href="${destination.url}" style="display:inline-block;margin-top:12px;color:#305542;font-size:13px;font-weight:700;text-decoration:none;">View destination</a>
+      <div class="gem-popup">
+        <img class="gem-popup__img" src="${escapeHtml(destination.imageUrl)}" alt="" loading="lazy">
+        <p class="gem-popup__title">${escapeHtml(destination.title)}</p>
+        <p class="gem-popup__place">${escapeHtml(destination.location || 'Malawi')}</p>
+        ${tagMarkup ? `<div class="gem-popup__tags">${tagMarkup}</div>` : ''}
+        <a class="gem-popup__link" href="${escapeHtml(destination.url)}">Read the story &rarr;</a>
       </div>
     `;
   }
@@ -106,13 +138,18 @@ document.addEventListener('DOMContentLoaded', () => {
         Accept: 'application/json',
       },
     });
+
+    if (!response.ok) {
+      throw new Error(`Destination request failed with ${response.status}`);
+    }
+
     const data = await response.json();
     const destinations = (data.destinations || []).filter((destination) => (
       typeof destination.latitude === 'number' && typeof destination.longitude === 'number'
     ));
 
     if (!destinations.length) {
-      element.closest('[data-map-shell]')?.classList.add('hidden');
+      hideMapShell(element);
       return;
     }
 
@@ -122,16 +159,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     destinations.forEach((destination) => {
       const marker = L.circleMarker([destination.latitude, destination.longitude], {
-        radius: destination.featured ? 8 : 6,
+        radius: destination.featured ? 9 : 7,
         weight: 2,
-        color: destination.featured ? '#d86d3c' : '#305542',
-        fillColor: destination.featured ? '#f0ab8c' : '#4f7a64',
-        fillOpacity: 0.92,
+        color: destination.featured ? BRAND.red : BRAND.green,
+        fillColor: destination.featured ? BRAND.sun : BRAND.greenSoft,
+        fillOpacity: 0.95,
       }).addTo(map);
 
       marker.bindPopup(buildPopup(destination), {
         closeButton: false,
-        className: 'destination-popup',
+        className: 'gem-popup-shell',
       });
 
       bounds.push([destination.latitude, destination.longitude]);
@@ -148,7 +185,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const longitude = Number.parseFloat(element.dataset.longitude || '');
 
     if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
-      element.closest('[data-map-shell]')?.classList.add('hidden');
+      hideMapShell(element);
       return;
     }
 
@@ -158,19 +195,72 @@ document.addEventListener('DOMContentLoaded', () => {
     const location = element.dataset.location || 'Malawi';
 
     L.circleMarker([latitude, longitude], {
-      radius: 8,
+      radius: 9,
       weight: 2,
-      color: '#d86d3c',
-      fillColor: '#f8b395',
+      color: BRAND.red,
+      fillColor: BRAND.sun,
       fillOpacity: 0.95,
     }).addTo(map).bindPopup(`
-      <div style="font-family:Manrope,sans-serif;">
-        <strong style="display:block;color:#182128;">${title}</strong>
-        <span style="color:#416f58;font-size:13px;">${location}</span>
+      <div class="gem-popup gem-popup--compact">
+        <p class="gem-popup__title">${escapeHtml(title)}</p>
+        <p class="gem-popup__place">${escapeHtml(location)}</p>
       </div>
-    `).openPopup();
+    `, { closeButton: false, className: 'gem-popup-shell' }).openPopup();
 
     map.setView([latitude, longitude], 10);
+  }
+
+  function buildOpenStreetMapDirectionsUrl(origin, destination) {
+    const params = new URLSearchParams({
+      engine: 'fossgis_osrm_car',
+      route: `${origin.latitude},${origin.longitude};${destination.latitude},${destination.longitude}`,
+    });
+
+    return `https://www.openstreetmap.org/directions?${params.toString()}#map=11/${destination.latitude}/${destination.longitude}`;
+  }
+
+  function wireDirections() {
+    document.querySelectorAll('[data-directions]').forEach((directions) => {
+      const button = directions.querySelector('[data-directions-button]');
+      const status = directions.querySelector('[data-directions-status]');
+      const latitude = Number.parseFloat(directions.dataset.latitude || '');
+      const longitude = Number.parseFloat(directions.dataset.longitude || '');
+
+      if (!button || !status || !Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return;
+      }
+
+      button.addEventListener('click', () => {
+        if (!('geolocation' in navigator)) {
+          status.textContent = 'Your browser cannot read your current location.';
+          return;
+        }
+
+        button.disabled = true;
+        status.textContent = 'Getting your location...';
+
+        navigator.geolocation.getCurrentPosition((position) => {
+          const directionsUrl = buildOpenStreetMapDirectionsUrl({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          }, {
+            latitude,
+            longitude,
+          });
+
+          status.textContent = 'Opening OpenStreetMap directions.';
+          button.disabled = false;
+          window.open(directionsUrl, '_blank', 'noopener,noreferrer');
+        }, () => {
+          status.textContent = 'Location access was not allowed. You can still open the place in OpenStreetMap.';
+          button.disabled = false;
+        }, {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 300000,
+        });
+      });
+    });
   }
 
   function wireMaps() {
@@ -180,25 +270,32 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
+    const render = async (element) => {
+      try {
+        if (element.dataset.mapMode === 'collection') {
+          await renderCollectionMap(element);
+          return;
+        }
+
+        await renderSingleDestinationMap(element);
+      } catch (error) {
+        hideMapShell(element);
+      }
+    };
+
+    if (!('IntersectionObserver' in window)) {
+      mapElements.forEach(render);
+      return;
+    }
+
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach(async (entry) => {
+      entries.forEach((entry) => {
         if (!entry.isIntersecting) {
           return;
         }
 
-        const element = entry.target;
-        observer.unobserve(element);
-
-        try {
-          if (element.dataset.mapMode === 'collection') {
-            await renderCollectionMap(element);
-            return;
-          }
-
-          await renderSingleDestinationMap(element);
-        } catch (error) {
-          element.closest('[data-map-shell]')?.classList.add('hidden');
-        }
+        observer.unobserve(entry.target);
+        render(entry.target);
       });
     }, {
       rootMargin: '160px 0px',
@@ -212,4 +309,5 @@ document.addEventListener('DOMContentLoaded', () => {
   wireTextareas();
   wireImagePreview();
   wireMaps();
+  wireDirections();
 });

@@ -1,67 +1,66 @@
 <%- include('partials/header') %>
 
-<section class="space-y-8">
-  <div class="surface-panel p-8 md:p-10">
-    <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-      <div>
-        <p class="eyebrow">Dashboard</p>
-        <h1 class="mt-4 font-display text-5xl leading-none text-ink-900">Curate the next standout Malawi story.</h1>
-        <p class="mt-5 max-w-2xl text-base leading-8 text-ink-700">Feature stories for the homepage hero, moderate content quality, and keep the catalogue polished for readers on every device.</p>
-      </div>
-      <div class="flex flex-col gap-3 sm:flex-row">
-        <a href="/posts" class="inline-flex items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">Back to site</a>
-        <form action="/admin/logout" method="POST">
-          <button type="submit" class="inline-flex w-full items-center justify-center rounded-full border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100">Logout</button>
-        </form>
-      </div>
-    </div>
+<div class="admin-head">
+  <div class="admin-head__text">
+    <p class="eyebrow">Dashboard</p>
+    <h1 class="display-lg">Curate the next standout story.</h1>
+    <p class="lede">Feature a story on the homepage for seven days, or remove stories that break the guidelines.</p>
   </div>
+  <div class="btn-row">
+    <a href="/posts" class="btn btn--ghost">Back to site</a>
+    <form action="/admin/logout" method="POST">
+      <button type="submit" class="btn btn--danger">Log out</button>
+    </form>
+  </div>
+</div>
 
-  <% if (!posts.length) { %>
-    <div class="surface-panel px-8 py-14 text-center">
-      <p class="eyebrow">Empty state</p>
-      <h2 class="mt-4 font-display text-4xl text-ink-900">No posts available yet.</h2>
-      <p class="mx-auto mt-4 max-w-xl text-base leading-8 text-ink-700">Once contributors publish new stories, they will appear here for featuring and moderation.</p>
-    </div>
-  <% } else { %>
-    <div class="grid gap-5">
-      <% posts.forEach((post) => { %>
-        <article class="surface-panel grid gap-0 overflow-hidden lg:grid-cols-[240px_1fr]">
-          <img src="<%= post.imageUrl %>" alt="<%= post.title %>" class="h-64 w-full object-cover lg:h-full" loading="lazy">
-          <div class="flex flex-col justify-between gap-6 p-6 md:p-8">
-            <div>
-              <div class="flex flex-wrap gap-2">
+<% if (!posts.length) { %>
+  <div class="empty-state gap-top-lg">
+    <p class="eyebrow">Empty</p>
+    <h2 class="display-md gap-top-md">No stories yet.</h2>
+    <p class="lede gap-top-md">New stories will appear here as soon as contributors publish them.</p>
+  </div>
+<% } else { %>
+  <ul class="admin-list">
+    <% posts.forEach((post) => { %>
+      <li>
+        <article class="sheet admin-row<%= post.isCurrentlyFeatured ? ' is-featured' : '' %>">
+          <div class="admin-row__media">
+            <img src="<%= post.imageUrl %>" alt="" loading="lazy">
+          </div>
+          <div class="admin-row__body">
+            <ul class="meta">
+              <li><%= post.authorName %></li>
+              <% if (post.location) { %><li><%= post.location %></li><% } %>
+              <li><%= post.readTime %></li>
+              <li><time datetime="<%= new Date(post.createdAt).toISOString() %>"><%= new Date(post.createdAt).toDateString() %></time></li>
+            </ul>
+            <h2 class="admin-row__title"><a href="/posts/<%= post.id %>"><%= post.title %></a></h2>
+            <% if (post.isCurrentlyFeatured) { %>
+              <div><span class="badge">&#9733; Featured until <%= new Date(post.featuredUntil).toDateString() %></span></div>
+            <% } %>
+            <p class="muted"><%= post.excerpt %></p>
+            <% if (post.tags.length) { %>
+              <ul class="tag-list">
                 <% post.tags.forEach((tag) => { %>
-                  <span class="rounded-full bg-sand-100 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-forest-700"><%= tag.name %></span>
+                  <li><span class="tag"><%= tag.name %></span></li>
                 <% }) %>
-              </div>
-              <h2 class="mt-4 font-display text-4xl leading-none text-ink-900"><a href="/posts/<%= post.id %>" class="hover:text-forest-600"><%= post.title %></a></h2>
-              <div class="mt-4 flex flex-wrap gap-3 text-xs font-semibold uppercase tracking-[0.16em] text-forest-500">
-                <span><%= post.authorName %></span>
-                <% if (post.location) { %><span><%= post.location %></span><% } %>
-                <span><%= post.readTime %></span>
-              </div>
-              <% if (post.featured && post.featuredUntil) { %>
-                <div class="mt-5 inline-flex rounded-full bg-forest-100 px-4 py-2 text-xs font-semibold uppercase tracking-[0.16em] text-forest-700">
-                  Featured until <%= new Date(post.featuredUntil).toDateString() %>
-                </div>
-              <% } %>
-              <p class="mt-5 max-w-3xl text-sm leading-7 text-ink-700"><%= post.excerpt %></p>
-            </div>
-            <div class="flex flex-col gap-3 sm:flex-row">
-              <a href="/posts/<%= post.id %>" class="inline-flex items-center justify-center rounded-full border border-black/10 px-5 py-3 text-sm font-semibold text-ink-800 hover:border-forest-200 hover:text-forest-700">View story</a>
+              </ul>
+            <% } %>
+            <div class="btn-row">
+              <a href="/posts/<%= post.id %>" class="btn btn--ghost btn--sm">View</a>
               <form action="/admin/posts/<%= post.id %>/feature" method="POST">
-                <button type="submit" class="inline-flex w-full items-center justify-center rounded-full bg-forest-600 px-5 py-3 text-sm font-semibold text-white shadow-lg shadow-forest-600/20 hover:bg-forest-700">Feature this post</button>
+                <button type="submit" class="btn btn--sun btn--sm"><%= post.isCurrentlyFeatured ? 'Extend feature 7 days' : 'Feature this story' %></button>
               </form>
               <form action="/admin/posts/<%= post.id %>/delete" method="POST" class="delete-form">
-                <button type="submit" class="inline-flex w-full items-center justify-center rounded-full border border-red-200 bg-red-50 px-5 py-3 text-sm font-semibold text-red-700 hover:bg-red-100">Delete</button>
+                <button type="submit" class="btn btn--danger btn--sm">Delete</button>
               </form>
             </div>
           </div>
         </article>
-      <% }) %>
-    </div>
-  <% } %>
-</section>
+      </li>
+    <% }) %>
+  </ul>
+<% } %>
 
 <%- include('partials/footer') %>

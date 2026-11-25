@@ -1,33 +1,36 @@
 <%- include('partials/header') %>
 
-<section class="surface-panel overflow-hidden">
-  <div class="grid gap-8 p-8 md:p-12 lg:grid-cols-[0.95fr_1.05fr]">
-    <div>
-      <p class="eyebrow">About the platform</p>
-      <h1 class="mt-4 font-display text-5xl leading-none text-ink-900 md:text-6xl">Malawi discovery, designed with more care and less friction.</h1>
-    </div>
-    <div class="space-y-5 text-base leading-8 text-ink-700">
-      <p>Malawi Hidden Gems is a tourism storytelling platform for travelers and locals who want a cleaner, more premium way to document the places that make Malawi unforgettable.</p>
-      <p>We focus on graceful mobile experiences, resilient offline access, high-quality imagery, and destination discovery that still feels polished on slower networks and smaller devices.</p>
-    </div>
+<section class="about-intro">
+  <div>
+    <p class="eyebrow">About the project</p>
+    <h1 class="display-xl gap-top-md">A travel journal for Malawi, <em>written by everyone</em>.</h1>
   </div>
-  <div class="grid gap-px bg-black/5 lg:grid-cols-3">
-    <div class="bg-white px-8 py-8">
-      <p class="eyebrow">Editorial</p>
-      <h2 class="mt-3 font-display text-3xl text-ink-900">Human stories first.</h2>
-      <p class="mt-4 text-sm leading-7 text-ink-700">Travel memories, local food, adventure routes, wildlife highlights, and regional insights are all shaped into calm, readable experiences.</p>
-    </div>
-    <div class="bg-white px-8 py-8">
-      <p class="eyebrow">Technical</p>
-      <h2 class="mt-3 font-display text-3xl text-ink-900">Built for unstable internet.</h2>
-      <p class="mt-4 text-sm leading-7 text-ink-700">The app uses optimized image delivery, offline caching, and progressive enhancement so browsing still feels dependable in remote destinations.</p>
-    </div>
-    <div class="bg-white px-8 py-8">
-      <p class="eyebrow">Ownership</p>
-      <h2 class="mt-3 font-display text-3xl text-ink-900">Anonymous, but protected.</h2>
-      <p class="mt-4 text-sm leading-7 text-ink-700">Contributors can publish without accounts while editor tokens stay in the browser, making post updates simple without opening everything to the public.</p>
+  <div class="about-intro__text">
+    <p class="lede">Malawi Hidden Gems is a place for travellers and locals to record the spots that make Malawi unforgettable: a quiet cove on the lake, a waterfall on the plateau, the best chambo in town.</p>
+    <p class="lede">Anyone can share a story. No account, no sign-up. Just the place, a photo and what made it special.</p>
+    <div class="btn-row">
+      <a href="/posts/new" class="btn btn--primary">Share a gem <span class="arrow" aria-hidden="true">&rarr;</span></a>
+      <a href="/posts" class="btn btn--ghost">Read the stories</a>
     </div>
   </div>
 </section>
+
+<ol class="pillars">
+  <li class="pillar">
+    <span class="pillar__num" aria-hidden="true">01</span>
+    <h2 class="display-md">Human stories first.</h2>
+    <p>Travel memories, local food, hiking routes and wildlife sightings, told by the people who were there rather than by an advertiser.</p>
+  </li>
+  <li class="pillar">
+    <span class="pillar__num" aria-hidden="true">02</span>
+    <h2 class="display-md">Works on a weak signal.</h2>
+    <p>Pages you have opened stay readable offline, and images are compressed before upload, so the site still works on the road in remote areas.</p>
+  </li>
+  <li class="pillar">
+    <span class="pillar__num" aria-hidden="true">03</span>
+    <h2 class="display-md">Anonymous, but protected.</h2>
+    <p>When you publish, a private key is saved in your browser. Only that browser can edit or delete your story, without you needing an account.</p>
+  </li>
+</ol>
 
 <%- include('partials/footer') %>

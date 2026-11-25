@@ -1,3 +1,4 @@
+const path = require('path');
 const multer = require('multer');
 
 const env = require('./env');
@@ -10,20 +11,9 @@ const allowedMimeTypes = new Set([
   'image/webp',
   'image/avif',
 ]);
-const path = require('path');
-const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
-const { cloudinary } = require('./cloudinary');
-
-const cloudinaryStorage = new CloudinaryStorage({
-  cloudinary,
-  params: {
-    folder: env.cloudinaryFolder,
-    resource_type: 'image',
-    format: 'jpg',
-  },
-});
-
+// Files are kept in memory so Sharp can optimise them before utils/fileManager
+// streams the result to Cloudinary.
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: {
@@ -31,11 +21,11 @@ const upload = multer({
   },
   fileFilter(req, file, callback) {
     const extension = path.extname(file.originalname).toLowerCase();
-    const isAllowedExtension = allowedExtensions.has(extension);
-    const isAllowedMimeType = allowedMimeTypes.has(file.mimetype);
 
-    if (!isAllowedExtension || !isAllowedMimeType) {
-      callback(new Error('Only JPG, PNG, GIF, and WEBP image uploads are allowed.'));
+    if (!allowedExtensions.has(extension) || !allowedMimeTypes.has(file.mimetype)) {
+      const error = new Error('Only JPG, PNG, GIF, WEBP, and AVIF image uploads are allowed.');
+      error.statusCode = 400;
+      callback(error);
       return;
     }
 
@@ -45,5 +35,4 @@ const upload = multer({
 
 module.exports = {
   upload,
-  cloudinaryStorage,
 };
